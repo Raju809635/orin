@@ -1,81 +1,87 @@
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Briefcase, FileText, Landmark, Goal, GraduationCap } from "lucide-react";
-import Link from 'next/link';
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import React from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import Link from "next/link";
+import { GraduationCap } from "lucide-react";
+import GoogleIcon from "@/components/icons/google-icon";
 
-// Mock data
-const categories = [
-  { name: "School", description: "Grades 1-12, board prep, and Olympiads.", icon: <GraduationCap /> },
-  { name: "Intermediate", description: "Competitive exams like JEE, NEET, and EAMCET.", icon: <FileText /> },
-  { name: "B.Tech/College", description: "Coding, development, and career skills.", icon: <Briefcase /> },
-  { name: "Law", description: "CLAT, judiciary coaching, and law subjects.", icon: <Landmark /> },
-  { name: "Govt. Exams", description: "UPSC, SSC, Banking, and other state exams.", icon: <Goal /> },
-];
+export default function SignUpPage() {
+  const [role, setRole] = useState('student');
 
-
-export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-b from-violet-50 to-background py-20 md:py-32">
-          <div className="container">
-            <div className="max-w-4xl text-center mx-auto">
-              <h1 className="text-5xl md:text-7xl font-bold font-headline tracking-tight">
-                Find Your <span className="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-transparent bg-clip-text">Perfect Mentor</span>
-              </h1>
-              <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-                Connect with expert mentors for academic success and career growth. Personalized guidance across all subjects and competitive exams.
-              </p>
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/mentors">
-                  <Button size="lg" className="h-12 px-8">
-                      Explore Mentors
-                  </Button>
-                </Link>
-                <Link href="/become-a-mentor">
-                  <Button size="lg" variant="outline" className="h-12 px-8 bg-background/30 border-primary/20 hover:bg-background/80">
-                      Become a Mentor
-                  </Button>
-                </Link>
+    <div className="flex flex-col min-h-screen bg-background items-center justify-center p-4">
+       <div className="absolute top-8 left-8 flex items-center space-x-2">
+           <Link href="/home" className="flex items-center space-x-2">
+                <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
+                    <GraduationCap className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+           </Link>
+       </div>
+      <div className="w-full max-w-md">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl font-headline">Create an Account</CardTitle>
+            <CardDescription>Join Orin to find mentors or share your knowledge.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input id="email" type="email" placeholder="Enter your email" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" placeholder="Create a password" />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input id="confirm-password" type="password" placeholder="Confirm your password" />
+              </div>
+              <div className="space-y-2">
+                 <Label>I am a</Label>
+                 <RadioGroup defaultValue="student" className="flex space-x-4" onValueChange={setRole}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="student" id="role-student" />
+                      <Label htmlFor="role-student">Student</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="mentor" id="role-mentor" />
+                      <Label htmlFor="role-mentor">Mentor</Label>
+                    </div>
+                  </RadioGroup>
+              </div>
+              
+              <Link href={role === 'student' ? '/create-student-profile' : '/create-mentor-profile'} className="block w-full">
+                <Button className="w-full h-12">Sign Up</Button>
+              </Link>
+              
+               <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                </div>
+              </div>
+
+              <Button variant="outline" className="w-full h-12">
+                <GoogleIcon className="mr-2 h-5 w-5" />
+                Sign Up with Google
+              </Button>
+
+               <div className="mt-6 text-center text-sm text-muted-foreground">
+                Already have an account? <Link href="/signin" className="text-primary hover:underline">Sign In</Link>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Categories Section */}
-        <section className="py-16 md:py-24 bg-background">
-          <div className="container">
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold font-headline">Choose Your Category</h2>
-              <p className="mt-4 text-muted-foreground">Find mentors in a wide range of subjects and exam preparations.</p>
-            </div>
-            <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-              {categories.map((category) => (
-                <Link href={`/mentors?category=${category.name.toLowerCase()}`} key={category.name}>
-                  <Card className="group text-center hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <CardContent className="p-6">
-                      <div className="mx-auto text-primary w-12 h-12 flex items-center justify-center">
-                        {React.cloneElement(category.icon, { className: 'w-8 h-8' })}
-                      </div>
-                      <h3 className="mt-4 font-semibold font-headline">{category.name}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{category.description}</p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

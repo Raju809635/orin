@@ -1,46 +1,9 @@
-import Footer from "@/components/layout/footer";
-import Header from "@/components/layout/header";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function SignUpPage() {
-  return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-grow flex items-center justify-center py-12 md:py-20">
-        <div className="w-full max-w-md">
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-headline">Create an Account</CardTitle>
-              <CardDescription>Join Orin to find mentors or share your knowledge.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input id="fullName" placeholder="Enter your full name" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="Enter your email" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" placeholder="Create a password" />
-                </div>
-                <Button type="submit" className="w-full h-12">Sign Up</Button>
-                 <div className="text-center text-sm text-muted-foreground">
-                  Already have an account? <Link href="/signin" className="text-primary hover:underline">Sign In</Link>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+            <p>Please <Link href="/" className="text-primary underline">sign up here</Link>.</p>
         </div>
-      </main>
-      <Footer />
-    </div>
-  );
+    );
 }

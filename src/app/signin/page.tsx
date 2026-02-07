@@ -1,16 +1,22 @@
-import Footer from "@/components/layout/footer";
-import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { GraduationCap } from "lucide-react";
+import GoogleIcon from "@/components/icons/google-icon";
 
 export default function SignInPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-grow flex items-center justify-center py-12 md:py-20">
+     <div className="flex flex-col min-h-screen bg-background items-center justify-center p-4">
+        <div className="absolute top-8 left-8 flex items-center space-x-2">
+           <Link href="/home" className="flex items-center space-x-2">
+              <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
+                  <GraduationCap className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+            </Link>
+       </div>
         <div className="w-full max-w-md">
           <Card>
             <CardHeader className="text-center">
@@ -18,7 +24,7 @@ export default function SignInPage() {
               <CardDescription>Enter your credentials to access your account.</CardDescription>
             </CardHeader>
             <CardContent>
-              <form className="space-y-6">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <Input id="email" type="email" placeholder="Enter your email" />
@@ -30,16 +36,37 @@ export default function SignInPage() {
                   </div>
                   <Input id="password" type="password" placeholder="Enter your password" />
                 </div>
-                <Button type="submit" className="w-full h-12">Sign In</Button>
-                 <div className="text-center text-sm text-muted-foreground">
-                  Don't have an account? <Link href="/signup" className="text-primary hover:underline">Sign Up</Link>
+
+                <div className="space-y-2">
+                  <Link href="/dashboard" className="block w-full">
+                      <Button className="w-full h-12">Sign In as Student</Button>
+                  </Link>
+                  <Link href="/mentor-dashboard" className="block w-full">
+                      <Button className="w-full h-12" variant="secondary">Sign In as Mentor</Button>
+                  </Link>
                 </div>
-              </form>
+
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                    </div>
+                </div>
+
+                <Button variant="outline" className="w-full h-12">
+                    <GoogleIcon className="mr-2 h-5 w-5" />
+                    Sign In with Google
+                </Button>
+
+                 <div className="mt-6 text-center text-sm text-muted-foreground">
+                  Don't have an account? <Link href="/" className="text-primary hover:underline">Sign Up</Link>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
-      </main>
-      <Footer />
     </div>
   );
 }
