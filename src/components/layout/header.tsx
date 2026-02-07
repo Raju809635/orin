@@ -37,11 +37,11 @@ const Header = () => {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Link href="/signin">
-            <Button variant="outline">Sign In</Button>
+          <Link href="/dashboard">
+            <Button variant="outline">Dashboard</Button>
           </Link>
-          <Link href="/mentors">
-            <Button>Get Started</Button>
+          <Link href="/signin">
+            <Button>Sign Out</Button>
           </Link>
         </div>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>

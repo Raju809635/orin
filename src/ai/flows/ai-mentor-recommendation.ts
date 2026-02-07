@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {mentors} from '@/lib/mentors-data';
 
 const RecommendMentorsInputSchema = z.object({
   academicGoals: z
@@ -24,14 +25,14 @@ const RecommendMentorsOutputSchema = z.object({
   mentorRecommendations: z
     .array(
       z.object({
-        mentorId: z.string().describe('The ID of the recommended mentor.'),
+        mentorId: z.string().describe('The ID of the recommended mentor. This MUST be an ID from the provided list of mentors.'),
         matchPercentage: z
           .number()
           .describe('The percentage match between the student and the mentor.'),
         reason: z.string().describe('Reason why the mentor was recommended.'),
       })
     )
-    .describe('A list of recommended mentors with their match percentages.'),
+    .describe('A list of up to 3 recommended mentors with their match percentages.'),
 });
 export type RecommendMentorsOutput = z.infer<typeof RecommendMentorsOutputSchema>;
 
@@ -43,16 +44,21 @@ export async function recommendMentors(
 
 const prompt = ai.definePrompt({
   name: 'recommendMentorsPrompt',
-  input: {schema: RecommendMentorsInputSchema},
+  input: {schema: RecommendMentorsInputSchema.extend({
+    mentors: z.any()
+  })},
   output: {schema: RecommendMentorsOutputSchema},
-  prompt: `You are an AI mentor recommendation system. You will be provided with a student's academic goals, class level, and exam targets.
-  Based on this information, you will recommend mentors that are best suited for the student.
+  prompt: `You are an AI mentor recommendation system. You will be provided with a student's academic goals, class level, and exam targets, and a list of available mentors.
+  Based on this information, you will recommend up to 3 mentors that are best suited for the student from the provided list.
 
   Student Academic Goals: {{{academicGoals}}}
   Student Class Level: {{{classLevel}}}
   Student Exam Targets: {{#each examTargets}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}
 
-  Please provide a list of mentor recommendations with their match percentages and reasoning.
+  Available Mentors (JSON format):
+  {{{json mentors}}}
+
+  Please provide a list of mentor recommendations with their match percentages and reasoning. The mentorId for each recommendation MUST be one of the IDs from the provided mentor list.
   `,
 });
 
@@ -63,7 +69,10 @@ const recommendMentorsFlow = ai.defineFlow(
     outputSchema: RecommendMentorsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const {output} = await prompt({...input, mentors});
+    if (!output || !output.mentorRecommendations) {
+      return { mentorRecommendations: [] };
+    }
+    return output;
   }
 );

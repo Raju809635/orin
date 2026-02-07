@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
+import Chatbot from '@/components/layout/chatbot';
 
 export const metadata: Metadata = {
   title: 'Orin - Education Mentoring Marketplace',
@@ -21,6 +22,7 @@ export default function RootLayout({
       </head>
       <body className="font-body bg-background text-foreground antialiased">
         {children}
+        <Chatbot />
         <Toaster />
       </body>
     </html>
