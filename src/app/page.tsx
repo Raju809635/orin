@@ -10,8 +10,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
-import { signInWithGoogle, signUpWithEmailAndPassword } from "@/lib/firebase/auth";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/firebase";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
+import { setDoc, doc } from "firebase/firestore";
+import { useFirestore } from "@/firebase";
 
 export default function SignUpPage() {
   const [role, setRole] = useState('student');
@@ -20,16 +27,30 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
+  const auth = useAuth();
+  const firestore = useFirestore();
 
   const handleGoogleSignUp = async () => {
-    const user = await signInWithGoogle();
-    if (user) {
-      if (role === 'student') {
-        router.push('/create-student-profile');
-      } else {
-        router.push('/create-mentor-profile');
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      if (user && firestore) {
+        await setDoc(doc(firestore, 'users', user.uid), {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          role: role,
+        });
+        
+        if (role === 'student') {
+          router.push('/create-student-profile');
+        } else {
+          router.push('/create-mentor-profile');
+        }
       }
-    } else {
+    } catch (error) {
       toast({
         title: "Sign up failed",
         description: "Could not sign up with Google. Please try again.",
@@ -56,15 +77,23 @@ export default function SignUpPage() {
         return;
     }
 
-    const { user, error } = await signUpWithEmailAndPassword(email, password);
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const user = result.user;
+      if (user && firestore) {
+        await setDoc(doc(firestore, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          role: role,
+        });
 
-    if (user) {
-      if (role === 'student') {
-        router.push('/create-student-profile');
-      } else {
-        router.push('/create-mentor-profile');
+        if (role === 'student') {
+          router.push('/create-student-profile');
+        } else {
+          router.push('/create-mentor-profile');
+        }
       }
-    } else if (error) {
+    } catch (error: any) {
       toast({
         title: "Sign up failed",
         description: error.message,

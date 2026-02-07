@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,22 +9,60 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
-import { signInWithGoogle, signInWithEmailAndPassword } from "@/lib/firebase/auth";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth, useUser, useFirestore } from "@/firebase";
+import { 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signInWithEmailAndPassword 
+} from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
+  const auth = useAuth();
+  const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
+
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      if (user.role === 'student') {
+        router.push('/dashboard');
+      } else if (user.role === 'mentor') {
+        router.push('/mentor-dashboard');
+      }
+    }
+  }, [user, isUserLoading, router]);
 
   const handleGoogleSignIn = async () => {
-    const user = await signInWithGoogle();
-    if (user) {
-      // For now, default redirect to student dashboard.
-      // A more robust solution would check user role from a database.
-      router.push('/dashboard');
-    } else {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      if (user && firestore) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (!userDoc.exists()) {
+          // This is a first-time Google sign-in, treat as sign-up
+           toast({
+            title: "Account not found",
+            description: "Please sign up first to select a role.",
+            variant: "destructive",
+          });
+          router.push('/'); // Redirect to sign-up page
+          return;
+        }
+        const userData = userDoc.data();
+        if (userData.role === 'student') {
+          router.push('/dashboard');
+        } else if (userData.role === 'mentor') {
+          router.push('/mentor-dashboard');
+        }
+      }
+    } catch (error) {
        toast({
         title: "Sign in failed",
         description: "Could not sign in with Google. Please try again.",
@@ -34,13 +72,27 @@ export default function SignInPage() {
   };
 
   const handleEmailSignIn = async () => {
-    const { user, error } = await signInWithEmailAndPassword(email, password);
-
-    if (user) {
-      // For now, default redirect to student dashboard.
-      // A more robust solution would check user role from a database.
-      router.push('/dashboard');
-    } else if (error) {
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const user = result.user;
+       if (user && firestore) {
+        const userDoc = await getDoc(doc(firestore, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData.role === 'student') {
+            router.push('/dashboard');
+          } else if (userData.role === 'mentor') {
+            router.push('/mentor-dashboard');
+          }
+        } else {
+           toast({
+            title: "Sign in failed",
+            description: "User role not found.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
       toast({
         title: "Sign in failed",
         description: "Invalid email or password. Please try again.",
@@ -48,6 +100,14 @@ export default function SignInPage() {
       });
     }
   };
+
+  if (isUserLoading || user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
      <div className="flex flex-col min-h-screen bg-background items-center justify-center p-4">
@@ -81,7 +141,6 @@ export default function SignInPage() {
 
                 <div className="space-y-2">
                    <Button className="w-full h-12" onClick={handleEmailSignIn}>Sign In</Button>
-                   <p className="text-center text-sm text-muted-foreground">Note: Role-based sign-in is under development. All sign-ins are currently redirected to the student dashboard.</p>
                 </div>
 
                 <div className="relative">

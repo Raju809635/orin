@@ -1,28 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, GraduationCap } from "lucide-react";
-import { auth, onAuthStateChanged, signOut } from "@/lib/firebase/auth";
-import type { User } from 'firebase/auth';
+import { useAuth, useUser } from "@/firebase";
+import { signOut as firebaseSignOut } from "firebase/auth";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
   const handleSignOut = async () => {
-    await signOut();
+    await firebaseSignOut(auth);
     router.push('/');
   };
 
@@ -30,6 +24,11 @@ const Header = () => {
     { href: "/mentors", label: "Browse Mentors" },
     { href: "/become-a-mentor", label: "Become a Mentor" },
   ];
+  
+  const getDashboardHref = () => {
+      if (!user) return "/";
+      return user.role === 'mentor' ? '/mentor-dashboard' : '/dashboard';
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -54,14 +53,14 @@ const Header = () => {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
-           {user ? (
+           {!isUserLoading && user ? (
             <>
-              <Link href="/dashboard">
+              <Link href={getDashboardHref()}>
                 <Button variant="outline">Dashboard</Button>
               </Link>
               <Button onClick={handleSignOut}>Sign Out</Button>
             </>
-          ) : (
+          ) : !isUserLoading ? (
             <>
               <Link href="/signin">
                 <Button variant="outline">Sign In</Button>
@@ -70,7 +69,7 @@ const Header = () => {
                 <Button>Sign Up</Button>
               </Link>
             </>
-          )}
+          ) : null}
         </div>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
