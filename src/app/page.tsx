@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,9 +10,22 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
+import { signInWithGoogle } from "@/lib/firebase/auth";
 
 export default function SignUpPage() {
   const [role, setRole] = useState('student');
+  const router = useRouter();
+
+  const handleGoogleSignUp = async () => {
+    const user = await signInWithGoogle();
+    if (user) {
+      if (role === 'student') {
+        router.push('/create-student-profile');
+      } else {
+        router.push('/create-mentor-profile');
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background items-center justify-center p-4">
@@ -70,7 +84,7 @@ export default function SignUpPage() {
                 </div>
               </div>
 
-              <Button variant="outline" className="w-full h-12">
+              <Button variant="outline" className="w-full h-12" onClick={handleGoogleSignUp}>
                 <GoogleIcon className="mr-2 h-5 w-5" />
                 Sign Up with Google
               </Button>

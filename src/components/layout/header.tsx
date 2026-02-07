@@ -1,13 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, GraduationCap } from "lucide-react";
+import { auth, onAuthStateChanged, signOut } from "@/lib/firebase/auth";
+import type { User } from 'firebase/auth';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/');
+  };
 
   const navLinks = [
     { href: "/mentors", label: "Browse Mentors" },
@@ -37,12 +54,23 @@ const Header = () => {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Link href="/dashboard">
-            <Button variant="outline">Dashboard</Button>
-          </Link>
-          <Link href="/">
-            <Button>Sign Out</Button>
-          </Link>
+           {user ? (
+            <>
+              <Link href="/dashboard">
+                <Button variant="outline">Dashboard</Button>
+              </Link>
+              <Button onClick={handleSignOut}>Sign Out</Button>
+            </>
+          ) : (
+            <>
+              <Link href="/signin">
+                <Button variant="outline">Sign In</Button>
+              </Link>
+              <Link href="/">
+                <Button>Sign Up</Button>
+              </Link>
+            </>
+          )}
         </div>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>

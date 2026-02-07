@@ -1,3 +1,6 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -5,8 +8,20 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
+import { signInWithGoogle } from "@/lib/firebase/auth";
 
 export default function SignInPage() {
+  const router = useRouter();
+
+  const handleGoogleSignIn = async () => {
+    const user = await signInWithGoogle();
+    if (user) {
+      // For now, default redirect to student dashboard.
+      // A more robust solution would check user role from a database.
+      router.push('/dashboard');
+    }
+  };
+
   return (
      <div className="flex flex-col min-h-screen bg-background items-center justify-center p-4">
         <div className="absolute top-8 left-8 flex items-center space-x-2">
@@ -55,7 +70,7 @@ export default function SignInPage() {
                     </div>
                 </div>
 
-                <Button variant="outline" className="w-full h-12">
+                <Button variant="outline" className="w-full h-12" onClick={handleGoogleSignIn}>
                     <GoogleIcon className="mr-2 h-5 w-5" />
                     Sign In with Google
                 </Button>
