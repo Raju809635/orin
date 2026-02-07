@@ -11,7 +11,7 @@ import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth, useFirestore, FirestorePermissionError, errorEmitter } from "@/firebase";
+import { useAuth, useFirestore, FirestorePermissionError } from "@/firebase";
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -44,24 +44,26 @@ export default function SignUpPage() {
           role: role,
         };
 
-        setDoc(userDocRef, userData, { merge: true })
-          .then(() => {
-            if (role === 'student') {
-              router.push('/create-student-profile');
-            } else {
-              router.push('/create-mentor-profile');
-            }
-          })
-          .catch((serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: userDocRef.path,
-              operation: 'create',
-              requestResourceData: userData,
-            });
-            errorEmitter.emit('permission-error', permissionError);
+        try {
+          await setDoc(userDocRef, userData, { merge: true });
+        } catch (firestoreError) {
+          throw new FirestorePermissionError({
+            path: userDocRef.path,
+            operation: 'create',
+            requestResourceData: userData,
           });
+        }
+        
+        if (role === 'student') {
+          router.push('/create-student-profile');
+        } else {
+          router.push('/create-mentor-profile');
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === 'FirestorePermissionError') {
+        throw error;
+      }
       toast({
         title: "Sign up failed",
         description: "Could not sign up with Google. Please try again.",
@@ -101,29 +103,31 @@ export default function SignUpPage() {
           role: role,
         };
 
-        setDoc(userDocRef, userData)
-          .then(() => {
-            if (role === 'student') {
-              router.push('/create-student-profile');
-            } else {
-              router.push('/create-mentor-profile');
-            }
-          })
-          .catch((serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: userDocRef.path,
-              operation: 'create',
-              requestResourceData: userData,
+        try {
+            await setDoc(userDocRef, userData);
+        } catch (firestoreError) {
+            throw new FirestorePermissionError({
+                path: userDocRef.path,
+                operation: 'create',
+                requestResourceData: userData,
             });
-            errorEmitter.emit('permission-error', permissionError);
-          });
+        }
+
+        if (role === 'student') {
+          router.push('/create-student-profile');
+        } else {
+          router.push('/create-mentor-profile');
+        }
       }
     } catch (error: any) {
-      toast({
-        title: "Sign up failed",
-        description: error.message,
-        variant: "destructive",
-      });
+        if (error.name === 'FirestorePermissionError') {
+            throw error;
+        }
+        toast({
+            title: "Sign up failed",
+            description: error.message,
+            variant: "destructive",
+        });
     }
   };
 
