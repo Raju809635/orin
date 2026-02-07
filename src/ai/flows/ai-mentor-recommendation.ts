@@ -9,6 +9,7 @@
  */
 
 import {ai} from '@/ai';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 import {mentors} from '@/lib/mentors-data';
 
@@ -44,6 +45,7 @@ export async function recommendMentors(
 
 const prompt = ai.definePrompt({
   name: 'recommendMentorsPrompt',
+  model: googleAI.model('gemini-pro'),
   input: {schema: RecommendMentorsInputSchema.extend({
     mentors: z.any()
   })},

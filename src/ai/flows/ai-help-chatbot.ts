@@ -9,6 +9,7 @@
  */
 
 import {ai} from '@/ai';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const AIHelpChatbotInputSchema = z.object({
@@ -27,6 +28,7 @@ export async function aiHelpChatbot(input: AIHelpChatbotInput): Promise<AIHelpCh
 
 const prompt = ai.definePrompt({
   name: 'aiHelpChatbotPrompt',
+  model: googleAI.model('gemini-pro'),
   input: {schema: AIHelpChatbotInputSchema},
   output: {schema: AIHelpChatbotOutputSchema},
   prompt: `You are a chatbot designed to answer user questions about the Orin education mentoring marketplace platform.
