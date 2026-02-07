@@ -37,7 +37,7 @@ export default function SignUpPage() {
       const user = result.user;
       if (user && firestore) {
         await setDoc(doc(firestore, 'users', user.uid), {
-          uid: user.uid,
+          id: user.uid,
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
@@ -82,7 +82,7 @@ export default function SignUpPage() {
       const user = result.user;
       if (user && firestore) {
         await setDoc(doc(firestore, "users", user.uid), {
-          uid: user.uid,
+          id: user.uid,
           email: user.email,
           role: role,
         });

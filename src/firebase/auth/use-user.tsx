@@ -24,10 +24,22 @@ export const useUser = (): UseUserResult => {
 
   const user = useMemo(() => {
     if (!firebaseUser) return null;
-    return {
-      ...firebaseUser,
-      ...userData,
-    } as User;
+
+    // The user object from Firebase Auth has `uid`, but our app model uses `id`.
+    // The `userData` from Firestore contains the `role` and other profile info.
+    const finalUser: User = {
+      // Start with auth data, mapping uid to id
+      id: firebaseUser.uid,
+      email: firebaseUser.email,
+      displayName: firebaseUser.displayName,
+      photoURL: firebaseUser.photoURL,
+      // Spread Firestore data. It will have `id`, `email`, and `role`.
+      // It will overwrite properties from auth if they exist in the Firestore doc,
+      // which is often desired (e.g., if user updates their display name in their profile).
+      // Most importantly, it adds the `role`.
+      ...(userData || {}),
+    };
+    return finalUser;
   }, [firebaseUser, userData]);
 
   return {
