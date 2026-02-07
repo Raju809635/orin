@@ -16,6 +16,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   createUserWithEmailAndPassword,
+  User as FirebaseUser,
 } from 'firebase/auth';
 import { setDoc, doc } from "firebase/firestore";
 
@@ -29,45 +30,52 @@ export default function SignUpPage() {
   const auth = useAuth();
   const firestore = useFirestore();
 
+  const saveUserDocument = async (user: FirebaseUser) => {
+    if (!firestore) return;
+
+    const userDocRef = doc(firestore, 'users', user.uid);
+    const userData = {
+      id: user.uid,
+      email: user.email,
+      displayName: user.displayName || '',
+      photoURL: user.photoURL || '',
+      role: role,
+    };
+
+    try {
+      await setDoc(userDocRef, userData, { merge: true });
+      if (role === 'student') {
+        router.push('/create-student-profile');
+      } else {
+        router.push('/create-mentor-profile');
+      }
+    } catch (firestoreError) {
+      // This will be caught by the Next.js error boundary
+      throw new FirestorePermissionError({
+        path: userDocRef.path,
+        operation: 'create',
+        requestResourceData: userData,
+      });
+    }
+  };
+
   const handleGoogleSignUp = async () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      if (user && firestore) {
-        const userDocRef = doc(firestore, 'users', user.uid);
-        const userData = {
-          id: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          role: role,
-        };
-
-        try {
-          await setDoc(userDocRef, userData, { merge: true });
-          if (role === 'student') {
-            router.push('/create-student-profile');
-          } else {
-            router.push('/create-mentor-profile');
-          }
-        } catch (firestoreError) {
-          throw new FirestorePermissionError({
-            path: userDocRef.path,
-            operation: 'create',
-            requestResourceData: userData,
-          });
-        }
-      }
+      await saveUserDocument(result.user);
     } catch (error: any) {
-      if (error.name === 'FirestorePermissionError') {
-        throw error;
-      }
-      toast({
-        title: "Sign up failed",
-        description: "Could not sign up with Google. Please try again.",
-        variant: "destructive",
-      });
+       // This will only catch auth errors now. Firestore errors are thrown inside saveUserDocument.
+       if (error.name !== 'FirestorePermissionError') {
+         toast({
+          title: "Sign up failed",
+          description: "Could not sign up with Google. Please try again.",
+          variant: "destructive",
+        });
+       } else {
+         // Re-throw the detailed error for the boundary to catch
+         throw error;
+       }
     }
   };
 
@@ -91,41 +99,20 @@ export default function SignUpPage() {
 
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
-      const user = result.user;
-      if (user && firestore) {
-        const userDocRef = doc(firestore, "users", user.uid);
-        const userData = {
-          id: user.uid,
-          email: user.email,
-          displayName: user.displayName || '',
-          photoURL: user.photoURL || '',
-          role: role,
-        };
-
-        try {
-            await setDoc(userDocRef, userData);
-            if (role === 'student') {
-              router.push('/create-student-profile');
-            } else {
-              router.push('/create-mentor-profile');
-            }
-        } catch (firestoreError) {
-            throw new FirestorePermissionError({
-                path: userDocRef.path,
-                operation: 'create',
-                requestResourceData: userData,
-            });
-        }
-      }
+      await saveUserDocument(result.user);
     } catch (error: any) {
-        if (error.name === 'FirestorePermissionError') {
+        // This will only catch auth errors (e.g., email-already-in-use)
+        // Firestore errors are thrown inside saveUserDocument.
+        if (error.name !== 'FirestorePermissionError') {
+            toast({
+                title: "Sign up failed",
+                description: error.message,
+                variant: "destructive",
+            });
+        } else {
+            // Re-throw the detailed error for the boundary to catch
             throw error;
         }
-        toast({
-            title: "Sign up failed",
-            description: error.message,
-            variant: "destructive",
-        });
     }
   };
 
@@ -173,7 +160,7 @@ export default function SignUpPage() {
                   </RadioGroup>
               </div>
               
-              <Button className="w-full h-12" onClick={handleEmailSignUp}>Sign Up</Button>
+              <Button className="w-full h-12" onClick={handleEmailSignUp} suppressHydrationWarning={true}>Sign Up</Button>
               
                <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
@@ -184,7 +171,7 @@ export default function SignUpPage() {
                 </div>
               </div>
 
-              <Button variant="outline" className="w-full h-12" onClick={handleGoogleSignUp}>
+              <Button variant="outline" className="w-full h-12" onClick={handleGoogleSignUp} suppressHydrationWarning={true}>
                 <GoogleIcon className="mr-2 h-5 w-5" />
                 Sign Up with Google
               </Button>
