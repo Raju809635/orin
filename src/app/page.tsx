@@ -11,7 +11,7 @@ import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth, useFirestore, FirestorePermissionError } from "@/firebase";
+import { useAuth, useFirestore, FirestorePermissionError, errorEmitter } from "@/firebase";
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -30,7 +30,7 @@ export default function SignUpPage() {
   const auth = useAuth();
   const firestore = useFirestore();
 
-  const saveUserDocument = async (user: FirebaseUser) => {
+  const saveUserDocument = (user: FirebaseUser) => {
     if (!firestore) return;
 
     const userDocRef = doc(firestore, 'users', user.uid);
@@ -42,40 +42,44 @@ export default function SignUpPage() {
       role: role,
     };
 
-    try {
-      await setDoc(userDocRef, userData, { merge: true });
-      if (role === 'student') {
-        router.push('/create-student-profile');
-      } else {
-        router.push('/create-mentor-profile');
-      }
-    } catch (firestoreError) {
-      // This will be caught by the Next.js error boundary
-      throw new FirestorePermissionError({
-        path: userDocRef.path,
-        operation: 'create',
-        requestResourceData: userData,
+    setDoc(userDocRef, userData, { merge: true })
+      .then(() => {
+        // On success, navigate to the correct profile creation page.
+        if (role === 'student') {
+          router.push('/create-student-profile');
+        } else {
+          router.push('/create-mentor-profile');
+        }
+      })
+      .catch((serverError) => {
+        // Create the rich, contextual error.
+        const permissionError = new FirestorePermissionError({
+          path: userDocRef.path,
+          operation: 'create',
+          requestResourceData: userData,
+        });
+
+        // Emit the error globally. The FirebaseErrorListener will catch this
+        // and throw it, triggering the Next.js error boundary.
+        errorEmitter.emit('permission-error', permissionError);
       });
-    }
   };
 
   const handleGoogleSignUp = async () => {
     const provider = new GoogleAuthProvider();
     try {
+      // Step 1: Await authentication.
       const result = await signInWithPopup(auth, provider);
-      await saveUserDocument(result.user);
+      // Step 2: Call the non-blocking save function.
+      saveUserDocument(result.user);
     } catch (error: any) {
-       // This will only catch auth errors now. Firestore errors are thrown inside saveUserDocument.
-       if (error.name !== 'FirestorePermissionError') {
-         toast({
-          title: "Sign up failed",
-          description: "Could not sign up with Google. Please try again.",
-          variant: "destructive",
-        });
-       } else {
-         // Re-throw the detailed error for the boundary to catch
-         throw error;
-       }
+       // This will only catch auth errors (e.g., popup closed).
+       // Firestore errors are handled by the event emitter.
+       toast({
+        title: "Sign up failed",
+        description: "Could not sign up with Google. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -98,21 +102,18 @@ export default function SignUpPage() {
     }
 
     try {
+      // Step 1: Await authentication
       const result = await createUserWithEmailAndPassword(auth, email, password);
-      await saveUserDocument(result.user);
+      // Step 2: Call the non-blocking save function
+      saveUserDocument(result.user);
     } catch (error: any) {
-        // This will only catch auth errors (e.g., email-already-in-use)
-        // Firestore errors are thrown inside saveUserDocument.
-        if (error.name !== 'FirestorePermissionError') {
-            toast({
-                title: "Sign up failed",
-                description: error.message,
-                variant: "destructive",
-            });
-        } else {
-            // Re-throw the detailed error for the boundary to catch
-            throw error;
-        }
+        // This will only catch auth errors (e.g., email-already-in-use).
+        // Firestore errors are handled by the event emitter.
+        toast({
+            title: "Sign up failed",
+            description: error.message,
+            variant: "destructive",
+        });
     }
   };
 
