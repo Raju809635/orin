@@ -1,9 +1,9 @@
 // This file is populated with your Firebase configuration.
 export const firebaseConfig = {
-  projectId: "studio-6591899027-af977",
-  appId: "1:181473633960:web:f925f388dd6a50f01c449d",
+  projectId: "orin-486608",
+  appId: "1:181473633960:web:a31475e7a3a5f9731c449d",
   apiKey: "AIzaSyAvYc6zW5GdVDT25MZr_JNAVpdt962zRso",
-  authDomain: "studio-6591899027-af977.firebaseapp.com",
-  storageBucket: "studio-6591899027-af977.appspot.com",
+  authDomain: "orin-486608.firebaseapp.com",
+  storageBucket: "orin-486608.appspot.com",
   messagingSenderId: "181473633960"
 };
