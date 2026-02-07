@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
-export default function SignInPage() {
+export default function ForgotPasswordPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -14,8 +14,8 @@ export default function SignInPage() {
         <div className="w-full max-w-md">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-headline">Sign In</CardTitle>
-              <CardDescription>Enter your credentials to access your account.</CardDescription>
+              <CardTitle className="text-3xl font-headline">Forgot Password</CardTitle>
+              <CardDescription>Enter your email to receive a password reset link.</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-6">
@@ -23,16 +23,9 @@ export default function SignInPage() {
                   <Label htmlFor="email">Email Address</Label>
                   <Input id="email" type="email" placeholder="Enter your email" />
                 </div>
-                <div className="space-y-2">
-                   <div className="flex justify-between items-baseline">
-                    <Label htmlFor="password">Password</Label>
-                    <Link href="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
-                  </div>
-                  <Input id="password" type="password" placeholder="Enter your password" />
-                </div>
-                <Button type="submit" className="w-full h-12">Sign In</Button>
+                <Button type="submit" className="w-full h-12">Send Reset Link</Button>
                  <div className="text-center text-sm text-muted-foreground">
-                  Don't have an account? <Link href="/signup" className="text-primary hover:underline">Sign Up</Link>
+                  Remember your password? <Link href="/signin" className="text-primary hover:underline">Sign In</Link>
                 </div>
               </form>
             </CardContent>

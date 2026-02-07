@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -14,25 +14,26 @@ export default function SignInPage() {
         <div className="w-full max-w-md">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-headline">Sign In</CardTitle>
-              <CardDescription>Enter your credentials to access your account.</CardDescription>
+              <CardTitle className="text-3xl font-headline">Create an Account</CardTitle>
+              <CardDescription>Join Orin to find mentors or share your knowledge.</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input id="fullName" placeholder="Enter your full name" />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <Input id="email" type="email" placeholder="Enter your email" />
                 </div>
                 <div className="space-y-2">
-                   <div className="flex justify-between items-baseline">
-                    <Label htmlFor="password">Password</Label>
-                    <Link href="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
-                  </div>
-                  <Input id="password" type="password" placeholder="Enter your password" />
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" placeholder="Create a password" />
                 </div>
-                <Button type="submit" className="w-full h-12">Sign In</Button>
+                <Button type="submit" className="w-full h-12">Sign Up</Button>
                  <div className="text-center text-sm text-muted-foreground">
-                  Don't have an account? <Link href="/signup" className="text-primary hover:underline">Sign Up</Link>
+                  Already have an account? <Link href="/signin" className="text-primary hover:underline">Sign In</Link>
                 </div>
               </form>
             </CardContent>
