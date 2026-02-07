@@ -1,0 +1,947 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user in the Orin platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "role": {
+          "type": "string",
+          "description": "User's role (student, mentor, or admin)."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "profileDetails": {
+          "type": "string",
+          "description": "User's profile details."
+        },
+        "status": {
+          "type": "string",
+          "description": "User's status (e.g., active, inactive)."
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "email",
+        "profileDetails",
+        "status"
+      ]
+    },
+    "StudentProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "StudentProfile",
+      "type": "object",
+      "description": "Represents the profile of a student user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the StudentProfile entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:1 StudentProfile)"
+        },
+        "classLevel": {
+          "type": "string",
+          "description": "Student's class level."
+        },
+        "academicGoals": {
+          "type": "string",
+          "description": "Student's academic goals."
+        },
+        "examTargets": {
+          "type": "string",
+          "description": "Student's exam targets."
+        },
+        "preferences": {
+          "type": "string",
+          "description": "Student's preferences."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "classLevel",
+        "academicGoals",
+        "examTargets",
+        "preferences"
+      ]
+    },
+    "MentorProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MentorProfile",
+      "type": "object",
+      "description": "Represents the profile of a mentor user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MentorProfile entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:1 MentorProfile)"
+        },
+        "bio": {
+          "type": "string",
+          "description": "Mentor's biography."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the mentor's photo.",
+          "format": "uri"
+        },
+        "experienceYears": {
+          "type": "number",
+          "description": "Mentor's years of experience."
+        },
+        "qualifications": {
+          "type": "string",
+          "description": "Mentor's qualifications."
+        },
+        "languages": {
+          "type": "string",
+          "description": "Languages spoken by the mentor."
+        },
+        "verificationStatus": {
+          "type": "string",
+          "description": "Mentor's verification status."
+        },
+        "approvalStatus": {
+          "type": "string",
+          "description": "Mentor's approval status."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "bio",
+        "photoURL",
+        "experienceYears",
+        "qualifications",
+        "languages",
+        "verificationStatus",
+        "approvalStatus"
+      ]
+    },
+    "Category": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Category",
+      "type": "object",
+      "description": "Represents a category for subjects and mentors.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Category entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the category."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the category."
+        },
+        "parentCategoryId": {
+          "type": "string",
+          "description": "Reference to parent Category. (Relationship: Category 1:N Category)"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ]
+    },
+    "Subject": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Subject",
+      "type": "object",
+      "description": "Represents a subject within a category.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Subject entity."
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Reference to Category. (Relationship: Category 1:N Subject)"
+        },
+        "subjectName": {
+          "type": "string",
+          "description": "Name of the subject."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the subject."
+        }
+      },
+      "required": [
+        "id",
+        "categoryId",
+        "subjectName",
+        "description"
+      ]
+    },
+    "Exam": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Exam",
+      "type": "object",
+      "description": "Represents an exam specification linked to a category.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Exam entity."
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Reference to Category. (Relationship: Category 1:N Exam)"
+        },
+        "examName": {
+          "type": "string",
+          "description": "Name of the exam."
+        }
+      },
+      "required": [
+        "id",
+        "categoryId",
+        "examName"
+      ]
+    },
+    "MentorExpertise": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MentorExpertise",
+      "type": "object",
+      "description": "Junction table linking mentors to subjects and exams.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MentorExpertise entity."
+        },
+        "mentorId": {
+          "type": "string",
+          "description": "Reference to MentorProfile. (Relationship: MentorProfile 1:N MentorExpertise)"
+        },
+        "subjectId": {
+          "type": "string",
+          "description": "Reference to Subject. (Relationship: Subject 1:N MentorExpertise)"
+        },
+        "examId": {
+          "type": "string",
+          "description": "Reference to Exam. (Relationship: Exam 1:N MentorExpertise)"
+        }
+      },
+      "required": [
+        "id",
+        "mentorId",
+        "subjectId",
+        "examId"
+      ]
+    },
+    "MentorCategory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MentorCategory",
+      "type": "object",
+      "description": "Junction table for mentor category associations.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MentorCategory entity."
+        },
+        "mentorId": {
+          "type": "string",
+          "description": "Reference to MentorProfile. (Relationship: MentorProfile 1:N MentorCategory)"
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Reference to Category. (Relationship: Category 1:N MentorCategory)"
+        }
+      },
+      "required": [
+        "id",
+        "mentorId",
+        "categoryId"
+      ]
+    },
+    "TimeSlot": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TimeSlot",
+      "type": "object",
+      "description": "Represents a time slot for mentor availability.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the TimeSlot entity."
+        },
+        "mentorId": {
+          "type": "string",
+          "description": "Reference to MentorProfile. (Relationship: MentorProfile 1:N TimeSlot)"
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the time slot.",
+          "format": "date-time"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Start time of the time slot."
+        },
+        "endTime": {
+          "type": "string",
+          "description": "End time of the time slot."
+        },
+        "bookingStatus": {
+          "type": "string",
+          "description": "Booking status of the time slot (e.g., available, booked)."
+        }
+      },
+      "required": [
+        "id",
+        "mentorId",
+        "date",
+        "startTime",
+        "endTime",
+        "bookingStatus"
+      ]
+    },
+    "Booking": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Booking",
+      "type": "object",
+      "description": "Represents a booking made by a student for a mentor's time slot.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Booking entity."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to User (student). (Relationship: User 1:N Booking)"
+        },
+        "mentorId": {
+          "type": "string",
+          "description": "Reference to User (mentor). (Relationship: User 1:N Booking)"
+        },
+        "timeSlotId": {
+          "type": "string",
+          "description": "Reference to TimeSlot. (Relationship: TimeSlot 1:N Booking)"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the booking (e.g., pending, confirmed, completed, cancelled)."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the booking."
+        },
+        "paymentDetails": {
+          "type": "string",
+          "description": "Payment details for the booking."
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "mentorId",
+        "timeSlotId",
+        "status",
+        "price",
+        "paymentDetails"
+      ]
+    },
+    "Review": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Review",
+      "type": "object",
+      "description": "Represents a review given by a student for a mentor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Review entity."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to User (student). (Relationship: User 1:N Review)"
+        },
+        "mentorId": {
+          "type": "string",
+          "description": "Reference to User (mentor). (Relationship: User 1:N Review)"
+        },
+        "bookingId": {
+          "type": "string",
+          "description": "Reference to Booking. (Relationship: Booking 1:N Review)"
+        },
+        "rating": {
+          "type": "number",
+          "description": "Rating given by the student (1-5)."
+        },
+        "reviewText": {
+          "type": "string",
+          "description": "Text of the review."
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "mentorId",
+        "bookingId",
+        "rating",
+        "reviewText"
+      ]
+    },
+    "Favorite": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Favorite",
+      "type": "object",
+      "description": "Represents a student's favorite mentor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Favorite entity."
+        },
+        "studentId": {
+          "type": "string",
+          "description": "Reference to User (student). (Relationship: User 1:N Favorite)"
+        },
+        "mentorId": {
+          "type": "string",
+          "description": "Reference to User (mentor). (Relationship: User 1:N Favorite)"
+        }
+      },
+      "required": [
+        "id",
+        "studentId",
+        "mentorId"
+      ]
+    },
+    "ChatMessage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ChatMessage",
+      "type": "object",
+      "description": "Represents a chat message between a student and a mentor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ChatMessage entity."
+        },
+        "senderId": {
+          "type": "string",
+          "description": "Reference to User (sender). (Relationship: User 1:N ChatMessage)"
+        },
+        "receiverId": {
+          "type": "string",
+          "description": "Reference to User (receiver). (Relationship: User 1:N ChatMessage)"
+        },
+        "bookingId": {
+          "type": "string",
+          "description": "Reference to Booking. (Relationship: Booking 1:N ChatMessage)"
+        },
+        "messageText": {
+          "type": "string",
+          "description": "Text of the message."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of the message.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "senderId",
+        "receiverId",
+        "bookingId",
+        "messageText",
+        "timestamp"
+      ]
+    },
+    "Resource": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Resource",
+      "type": "object",
+      "description": "Represents a resource uploaded by a mentor.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Resource entity."
+        },
+        "mentorId": {
+          "type": "string",
+          "description": "Reference to User (mentor). (Relationship: User 1:N Resource)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the resource."
+        },
+        "fileURL": {
+          "type": "string",
+          "description": "URL of the resource file.",
+          "format": "uri"
+        },
+        "accessPermissions": {
+          "type": "string",
+          "description": "Access permissions for the resource."
+        }
+      },
+      "required": [
+        "id",
+        "mentorId",
+        "title",
+        "fileURL",
+        "accessPermissions"
+      ]
+    },
+    "Transaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transaction",
+      "type": "object",
+      "description": "Represents a transaction for payment tracking.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Transaction entity."
+        },
+        "bookingId": {
+          "type": "string",
+          "description": "Reference to Booking. (Relationship: Booking 1:N Transaction)"
+        },
+        "paymentAmount": {
+          "type": "number",
+          "description": "The amount paid in the transaction."
+        },
+        "platformCommission": {
+          "type": "number",
+          "description": "Commission taken by the platform."
+        },
+        "mentorEarnings": {
+          "type": "number",
+          "description": "Earnings of the mentor after commission."
+        },
+        "transactionDate": {
+          "type": "string",
+          "description": "The date the transaction occurred.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "bookingId",
+        "paymentAmount",
+        "platformCommission",
+        "mentorEarnings",
+        "transactionDate"
+      ]
+    },
+    "CouponCode": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CouponCode",
+      "type": "object",
+      "description": "Represents a coupon code for discounts.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CouponCode entity."
+        },
+        "code": {
+          "type": "string",
+          "description": "The coupon code."
+        },
+        "discountType": {
+          "type": "string",
+          "description": "Type of discount (percentage/fixed)."
+        },
+        "value": {
+          "type": "number",
+          "description": "Value of the discount."
+        },
+        "expiry": {
+          "type": "string",
+          "description": "Expiry date of the coupon code.",
+          "format": "date-time"
+        },
+        "usageLimits": {
+          "type": "number",
+          "description": "Usage limits for the coupon code."
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "discountType",
+        "value",
+        "expiry",
+        "usageLimits"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents a notification for email/in-app notifications.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Notification entity."
+        },
+        "recipientId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Notification)"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of notification (e.g., email, in-app)."
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the notification."
+        },
+        "readStatus": {
+          "type": "boolean",
+          "description": "Read status of the notification."
+        }
+      },
+      "required": [
+        "id",
+        "recipientId",
+        "type",
+        "content",
+        "readStatus"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Accessible by the user and admins.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/student_profile",
+        "definition": {
+          "entityName": "StudentProfile",
+          "schema": {
+            "$ref": "#/backend/entities/StudentProfile"
+          },
+          "description": "Stores student profile information. Accessible by the student and admins.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/mentor_profile",
+        "definition": {
+          "entityName": "MentorProfile",
+          "schema": {
+            "$ref": "#/backend/entities/MentorProfile"
+          },
+          "description": "Stores mentor profile information. Accessible by the mentor and admins.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/categories/{categoryId}",
+        "definition": {
+          "entityName": "Category",
+          "schema": {
+            "$ref": "#/backend/entities/Category"
+          },
+          "description": "Stores categories for subjects and mentors. Publicly readable.",
+          "params": [
+            {
+              "name": "categoryId",
+              "description": "The unique identifier for the category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/categories/{categoryId}/subjects/{subjectId}",
+        "definition": {
+          "entityName": "Subject",
+          "schema": {
+            "$ref": "#/backend/entities/Subject"
+          },
+          "description": "Stores subjects within a category. Publicly readable.",
+          "params": [
+            {
+              "name": "categoryId",
+              "description": "The unique identifier for the category."
+            },
+            {
+              "name": "subjectId",
+              "description": "The unique identifier for the subject."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/categories/{categoryId}/exams/{examId}",
+        "definition": {
+          "entityName": "Exam",
+          "schema": {
+            "$ref": "#/backend/entities/Exam"
+          },
+          "description": "Stores exam specifications linked to a category. Publicly readable.",
+          "params": [
+            {
+              "name": "categoryId",
+              "description": "The unique identifier for the category."
+            },
+            {
+              "name": "examId",
+              "description": "The unique identifier for the exam."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/mentor_expertise/{mentorExpertiseId}",
+        "definition": {
+          "entityName": "MentorExpertise",
+          "schema": {
+            "$ref": "#/backend/entities/MentorExpertise"
+          },
+          "description": "Junction table linking mentors to subjects and exams. Accessible by admins.",
+          "params": [
+            {
+              "name": "mentorExpertiseId",
+              "description": "The unique identifier for the mentor expertise."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/mentor_categories/{mentorCategoryId}",
+        "definition": {
+          "entityName": "MentorCategory",
+          "schema": {
+            "$ref": "#/backend/entities/MentorCategory"
+          },
+          "description": "Junction table for mentor category associations. Accessible by admins.",
+          "params": [
+            {
+              "name": "mentorCategoryId",
+              "description": "The unique identifier for the mentor category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{mentorId}/timeslots/{timeSlotId}",
+        "definition": {
+          "entityName": "TimeSlot",
+          "schema": {
+            "$ref": "#/backend/entities/TimeSlot"
+          },
+          "description": "Stores time slots for mentor availability. Accessible by the mentor and admins.",
+          "params": [
+            {
+              "name": "mentorId",
+              "description": "The unique identifier for the mentor."
+            },
+            {
+              "name": "timeSlotId",
+              "description": "The unique identifier for the time slot."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/bookings/{bookingId}",
+        "definition": {
+          "entityName": "Booking",
+          "schema": {
+            "$ref": "#/backend/entities/Booking"
+          },
+          "description": "Stores booking information. Includes denormalized 'studentId' and 'mentorId' for authorization independence. Accessible by the student, the mentor and admins.",
+          "params": [
+            {
+              "name": "bookingId",
+              "description": "The unique identifier for the booking."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/bookings/{bookingId}/reviews/{reviewId}",
+        "definition": {
+          "entityName": "Review",
+          "schema": {
+            "$ref": "#/backend/entities/Review"
+          },
+          "description": "Stores reviews given by a student for a mentor. Accessible by the student, the mentor and admins.",
+          "params": [
+            {
+              "name": "bookingId",
+              "description": "The unique identifier for the booking."
+            },
+            {
+              "name": "reviewId",
+              "description": "The unique identifier for the review."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{studentId}/favorites/{favoriteId}",
+        "definition": {
+          "entityName": "Favorite",
+          "schema": {
+            "$ref": "#/backend/entities/Favorite"
+          },
+          "description": "Stores a student's favorite mentors. Accessible by the student and admins.",
+          "params": [
+            {
+              "name": "studentId",
+              "description": "The unique identifier for the student."
+            },
+            {
+              "name": "favoriteId",
+              "description": "The unique identifier for the favorite."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/bookings/{bookingId}/chat_messages/{messageId}",
+        "definition": {
+          "entityName": "ChatMessage",
+          "schema": {
+            "$ref": "#/backend/entities/ChatMessage"
+          },
+          "description": "Stores chat messages between a student and a mentor. Accessible by the student, the mentor and admins.",
+          "params": [
+            {
+              "name": "bookingId",
+              "description": "The unique identifier for the booking."
+            },
+            {
+              "name": "messageId",
+              "description": "The unique identifier for the chat message."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{mentorId}/resources/{resourceId}",
+        "definition": {
+          "entityName": "Resource",
+          "schema": {
+            "$ref": "#/backend/entities/Resource"
+          },
+          "description": "Stores resources uploaded by a mentor. Accessible by the mentor and admins.",
+          "params": [
+            {
+              "name": "mentorId",
+              "description": "The unique identifier for the mentor."
+            },
+            {
+              "name": "resourceId",
+              "description": "The unique identifier for the resource."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/transactions/{transactionId}",
+        "definition": {
+          "entityName": "Transaction",
+          "schema": {
+            "$ref": "#/backend/entities/Transaction"
+          },
+          "description": "Stores transaction information for payment tracking. Accessible by admins.",
+          "params": [
+            {
+              "name": "transactionId",
+              "description": "The unique identifier for the transaction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/coupon_codes/{couponCodeId}",
+        "definition": {
+          "entityName": "CouponCode",
+          "schema": {
+            "$ref": "#/backend/entities/CouponCode"
+          },
+          "description": "Stores coupon codes for discounts. Accessible by admins.",
+          "params": [
+            {
+              "name": "couponCodeId",
+              "description": "The unique identifier for the coupon code."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores notifications for email/in-app notifications. Accessible by admins.",
+          "params": [
+            {
+              "name": "notificationId",
+              "description": "The unique identifier for the notification."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "admin_role",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Documents in this collection represent admin users.  The *existence* of a document indicates admin role.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the Orin platform's mentoring marketplace, focusing on security, scalability, and debuggability. The design adheres to Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), QAPs (Rules are not Filters), and Invariants.\n\n**Authorization Independence:**\nAuthorization independence is achieved by denormalizing authorization-related data. For example, the `Booking` documents duplicate `studentId` and `mentorId`. This eliminates the need for `get()` calls in security rules to verify user roles or relationships, enabling atomic operations and improving security rule performance.\n\n**Structural Segregation (Homogeneous Security Posture):**\nThe database structure segregates data based on access needs. User profiles are stored under `/users/{userId}`, ensuring that only the user and admins can access them. Mentor-specific data like `/users/{mentorId}/timeslots` and `/users/{mentorId}/resources` are organized under the mentor's profile, clearly defining ownership and access.\n\n**Access Modeling (Standardization and Consistency):**\nThe design uses consistent patterns for authorization:\n\n*   **Private Data:** User profiles and related data (student profiles, mentor profiles) are stored using path-based ownership under `/users/{userId}`.\n*   **User-Owned Data:** Data related to users such as time slots (`/users/{mentorId}/timeslots/{timeslotId}`), resources (`/users/{mentorId}/resources/{resourceId}`), bookings (`/users/{studentId}/bookings/{bookingId}`) are organized hierarchically.\n*   **Collaborative Data:** The chat messages are stored in `/bookings/{bookingId}/chat_messages/{messageId}`, this is fine since a user must have an existing booking to be able to chat, which also creates a paper trail for admins in case of disputes.\n*   **Global Roles (DBAC):** While the schema includes a `role` field in the `User` document, it is recommended to manage admin roles via the existence of documents in a dedicated `/roles_admin/{uid}` collection. This simplifies security rules and avoids content-based authorization.\n\n**QAPs (Rules are not Filters):**\nThe data structure supports secure `list` operations by avoiding reliance on filtering data based on user roles in the rules. For instance, listing mentors is enabled through `/users/{mentorId}`. If a global list of mentors is required without authentication, a separate collection `/mentors` containing a subset of safe data from `/users/{mentorId}` could be maintained (This would need to be kept in sync via a cloud function on writes to `/users/{mentorId}`).\n\n**Data Clarity and Predictability:**\n\n*   **Explicit State Modeling:** The `Booking` entity has a `status` field that explicitly models the state of a booking (pending, confirmed, completed, cancelled), improving clarity and avoiding complex logic based on multiple fields.\n*   **Predictable Schema:** The schema uses static keys and avoids dynamic keys. Arrays of objects are used where applicable.\n*   **Radical Consistency:** Naming conventions are standardized, with authorization fields consistently named (e.g., `userId`, `mentorId`, `studentId`)."
+  }
+}
