@@ -27,7 +27,7 @@ export async function aiSmartSearch(input: AISmartSearchInput): Promise<AISmartS
 
 const prompt = ai.definePrompt({
   name: 'aiSmartSearchPrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: 'googleai/gemini-1.5-flash',
   input: {schema: AISmartSearchInputSchema},
   output: {schema: AISmartSearchOutputSchema},
   prompt: `You are a search assistant for a mentor marketplace.

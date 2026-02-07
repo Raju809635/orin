@@ -44,7 +44,7 @@ export async function recommendMentors(
 
 const prompt = ai.definePrompt({
   name: 'recommendMentorsPrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: 'googleai/gemini-1.5-flash',
   input: {schema: RecommendMentorsInputSchema.extend({
     mentors: z.any()
   })},

@@ -27,7 +27,7 @@ export async function aiHelpChatbot(input: AIHelpChatbotInput): Promise<AIHelpCh
 
 const prompt = ai.definePrompt({
   name: 'aiHelpChatbotPrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: 'googleai/gemini-1.5-flash',
   input: {schema: AIHelpChatbotInputSchema},
   output: {schema: AIHelpChatbotOutputSchema},
   prompt: `You are a chatbot designed to answer user questions about the Orin education mentoring marketplace platform.
