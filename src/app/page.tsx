@@ -11,14 +11,13 @@ import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/firebase";
+import { useAuth, useFirestore, FirestorePermissionError, errorEmitter } from "@/firebase";
 import {
   GoogleAuthProvider,
   signInWithPopup,
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
 import { setDoc, doc } from "firebase/firestore";
-import { useFirestore } from "@/firebase";
 
 export default function SignUpPage() {
   const [role, setRole] = useState('student');
@@ -36,19 +35,31 @@ export default function SignUpPage() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       if (user && firestore) {
-        await setDoc(doc(firestore, 'users', user.uid), {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const userData = {
           id: user.uid,
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
           role: role,
-        });
-        
-        if (role === 'student') {
-          router.push('/create-student-profile');
-        } else {
-          router.push('/create-mentor-profile');
-        }
+        };
+
+        setDoc(userDocRef, userData, { merge: true })
+          .then(() => {
+            if (role === 'student') {
+              router.push('/create-student-profile');
+            } else {
+              router.push('/create-mentor-profile');
+            }
+          })
+          .catch((serverError) => {
+            const permissionError = new FirestorePermissionError({
+              path: userDocRef.path,
+              operation: 'create',
+              requestResourceData: userData,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+          });
       }
     } catch (error) {
       toast({
@@ -81,17 +92,31 @@ export default function SignUpPage() {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       const user = result.user;
       if (user && firestore) {
-        await setDoc(doc(firestore, "users", user.uid), {
+        const userDocRef = doc(firestore, "users", user.uid);
+        const userData = {
           id: user.uid,
           email: user.email,
+          displayName: user.displayName || '',
+          photoURL: user.photoURL || '',
           role: role,
-        });
+        };
 
-        if (role === 'student') {
-          router.push('/create-student-profile');
-        } else {
-          router.push('/create-mentor-profile');
-        }
+        setDoc(userDocRef, userData)
+          .then(() => {
+            if (role === 'student') {
+              router.push('/create-student-profile');
+            } else {
+              router.push('/create-mentor-profile');
+            }
+          })
+          .catch((serverError) => {
+            const permissionError = new FirestorePermissionError({
+              path: userDocRef.path,
+              operation: 'create',
+              requestResourceData: userData,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+          });
       }
     } catch (error: any) {
       toast({
