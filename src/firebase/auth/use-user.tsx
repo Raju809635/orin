@@ -22,7 +22,7 @@ export const useUser = (): UseUserResult => {
 
   const userDocRef = useMemoFirebase(
     () => (firestore && firebaseUser ? doc(firestore, 'users', firebaseUser.uid) : null),
-    [firestore, firebaseUser]
+    [firestore, firebaseUser?.uid]
   );
 
   const { data: userData, isLoading: isDocLoading } = useDoc<User>(userDocRef);
