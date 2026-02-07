@@ -62,10 +62,11 @@ export default function SignInPage() {
           router.push('/mentor-dashboard');
         }
       }
-    } catch (error) {
-       toast({
+    } catch (error: any) {
+      console.error("Google Sign-In Error: ", error);
+      toast({
         title: "Sign in failed",
-        description: "Could not sign in with Google. Please try again.",
+        description: error.message || "Could not sign in with Google. Please try again.",
         variant: "destructive",
       });
     }
@@ -92,10 +93,11 @@ export default function SignInPage() {
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Email Sign-In Error: ", error);
       toast({
         title: "Sign in failed",
-        description: "Invalid email or password. Please try again.",
+        description: error.message || "Invalid email or password. Please try again.",
         variant: "destructive",
       });
     }

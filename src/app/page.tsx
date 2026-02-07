@@ -73,11 +73,10 @@ export default function SignUpPage() {
       // Step 2: Call the non-blocking save function.
       saveUserDocument(result.user);
     } catch (error: any) {
-       // This will only catch auth errors (e.g., popup closed).
-       // Firestore errors are handled by the event emitter.
-       toast({
+      console.error("Google Sign-Up Error: ", error);
+      toast({
         title: "Sign up failed",
-        description: "Could not sign up with Google. Please try again.",
+        description: error.message || "Could not sign up with Google. Please try again.",
         variant: "destructive",
       });
     }
@@ -107,11 +106,12 @@ export default function SignUpPage() {
       // Step 2: Call the non-blocking save function
       saveUserDocument(result.user);
     } catch (error: any) {
+        console.error("Email Sign-Up Error: ", error);
         // This will only catch auth errors (e.g., email-already-in-use).
         // Firestore errors are handled by the event emitter.
         toast({
             title: "Sign up failed",
-            description: error.message,
+            description: error.message || "An unexpected error occurred.",
             variant: "destructive",
         });
     }
@@ -161,7 +161,7 @@ export default function SignUpPage() {
                   </RadioGroup>
               </div>
               
-              <Button className="w-full h-12" onClick={handleEmailSignUp} suppressHydrationWarning={true}>Sign Up</Button>
+              <Button className="w-full h-12" onClick={handleEmailSignUp}>Sign Up</Button>
               
                <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
@@ -172,7 +172,7 @@ export default function SignUpPage() {
                 </div>
               </div>
 
-              <Button variant="outline" className="w-full h-12" onClick={handleGoogleSignUp} suppressHydrationWarning={true}>
+              <Button variant="outline" className="w-full h-12" onClick={handleGoogleSignUp}>
                 <GoogleIcon className="mr-2 h-5 w-5" />
                 Sign Up with Google
               </Button>
