@@ -10,8 +10,8 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { href: "#", label: "Browse Mentors" },
-    { href: "#", label: "Become a Mentor" },
+    { href: "/mentors", label: "Browse Mentors" },
+    { href: "/become-a-mentor", label: "Become a Mentor" },
   ];
 
   return (
@@ -37,8 +37,12 @@ const Header = () => {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button variant="outline">Sign In</Button>
-          <Button>Get Started</Button>
+          <Link href="/signin">
+            <Button variant="outline">Sign In</Button>
+          </Link>
+          <Link href="/mentors">
+            <Button>Get Started</Button>
+          </Link>
         </div>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>

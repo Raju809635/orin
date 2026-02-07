@@ -35,12 +35,16 @@ export default function Home() {
                 Connect with expert mentors for academic success and career growth. Personalized guidance across all subjects and competitive exams.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button size="lg" className="h-12 px-8">
-                    Explore Mentors
-                </Button>
-                <Button size="lg" variant="outline" className="h-12 px-8 bg-background/30 border-primary/20 hover:bg-background/80">
-                    Become a Mentor
-                </Button>
+                <Link href="/mentors">
+                  <Button size="lg" className="h-12 px-8">
+                      Explore Mentors
+                  </Button>
+                </Link>
+                <Link href="/become-a-mentor">
+                  <Button size="lg" variant="outline" className="h-12 px-8 bg-background/30 border-primary/20 hover:bg-background/80">
+                      Become a Mentor
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -55,7 +59,7 @@ export default function Home() {
             </div>
             <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
               {categories.map((category) => (
-                <Link href="#" key={category.name}>
+                <Link href={`/mentors?category=${category.name.toLowerCase()}`} key={category.name}>
                   <Card className="group text-center hover:bg-primary/5 hover:border-primary/20 transition-all">
                     <CardContent className="p-6">
                       <div className="mx-auto text-primary w-12 h-12 flex items-center justify-center">
