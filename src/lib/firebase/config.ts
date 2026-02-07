@@ -1,9 +1,9 @@
 // This file is populated with your Firebase configuration.
 export const firebaseConfig = {
-  apiKey: "AIzaSyC...your-key-here",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:12345abcde"
+  projectId: "studio-6591899027-af977",
+  appId: "1:181473633960:web:f925f388dd6a50f01c449d",
+  apiKey: "AIzaSyAvYc6zW5GdVDT25MZr_JNAVpdt962zRso",
+  authDomain: "studio-6591899027-af977.firebaseapp.com",
+  storageBucket: "studio-6591899027-af977.appspot.com",
+  messagingSenderId: "181473633960"
 };
