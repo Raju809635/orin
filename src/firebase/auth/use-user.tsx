@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useUser as useFirebaseUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { User } from '@/models/user';
 
@@ -12,8 +12,12 @@ export interface UseUserResult {
 }
 
 export const useUser = (): UseUserResult => {
-  const { user: firebaseUser, isUserLoading: isAuthLoading, userError } = useFirebaseUser();
-  const firestore = useFirestore();
+  const {
+    user: firebaseUser,
+    isUserLoading: isAuthLoading,
+    userError,
+    firestore,
+  } = useFirebase();
 
   const userDocRef = useMemoFirebase(
     () => (firestore && firebaseUser ? doc(firestore, 'users', firebaseUser.uid) : null),
