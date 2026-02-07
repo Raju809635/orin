@@ -9,7 +9,6 @@
  */
 
 import {ai} from '@/ai';
-import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 
 const AISmartSearchInputSchema = z.object({
@@ -28,7 +27,7 @@ export async function aiSmartSearch(input: AISmartSearchInput): Promise<AISmartS
 
 const prompt = ai.definePrompt({
   name: 'aiSmartSearchPrompt',
-  model: googleAI.model('gemini-pro'),
+  model: 'googleai/gemini-pro',
   input: {schema: AISmartSearchInputSchema},
   output: {schema: AISmartSearchOutputSchema},
   prompt: `You are a search assistant for a mentor marketplace.
