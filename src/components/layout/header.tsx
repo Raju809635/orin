@@ -5,9 +5,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, GraduationCap } from "lucide-react";
+import { Menu, GraduationCap, LayoutDashboard, User as UserIcon, LogOut } from "lucide-react";
 import { useAuth, useUser } from "@/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "../ui/skeleton";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +38,20 @@ const Header = () => {
   const getDashboardHref = () => {
       if (!user) return "/";
       return user.role === 'mentor' ? '/mentor-dashboard' : '/dashboard';
+  }
+
+  const getProfileHref = () => {
+    if (!user) return "/";
+    return user.role === 'mentor' ? '/create-mentor-profile' : '/create-student-profile';
+  }
+
+  const getInitials = (name?: string | null) => {
+    if (!name) return 'U';
+    const nameParts = name.split(' ');
+    if (nameParts.length > 1) {
+      return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`;
+    }
+    return name.slice(0, 2);
   }
 
   return (
@@ -52,53 +76,100 @@ const Header = () => {
             </Link>
           ))}
         </nav>
-        <div className="flex flex-1 items-center justify-end space-x-2">
-           {!isUserLoading && user ? (
-            <>
-              <Link href={getDashboardHref()}>
-                <Button variant="outline">Dashboard</Button>
-              </Link>
-              <Button onClick={handleSignOut}>Sign Out</Button>
-            </>
-          ) : !isUserLoading ? (
-            <>
+        <div className="flex flex-1 items-center justify-end space-x-4">
+           {isUserLoading ? (
+             <Skeleton className="h-8 w-8 rounded-full" />
+           ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
+                    <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href={getDashboardHref()}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                   <Link href={getProfileHref()}>
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="hidden items-center space-x-2 md:flex">
               <Link href="/signin">
                 <Button variant="outline">Sign In</Button>
               </Link>
               <Link href="/">
                 <Button>Sign Up</Button>
               </Link>
-            </>
-          ) : null}
-        </div>
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden ml-2">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="pr-0">
-            <Link href="/home" className="flex items-center space-x-2 mb-6" onClick={() => setIsOpen(false)}>
-                <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
-                    <GraduationCap className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
-            </Link>
-            <div className="flex flex-col space-y-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-base font-medium transition-colors hover:text-primary text-foreground/80"
-                >
-                  {link.label}
-                </Link>
-              ))}
             </div>
-          </SheetContent>
-        </Sheet>
+          )}
+           <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="pr-0">
+              <Link href="/home" className="flex items-center space-x-2 mb-6" onClick={() => setIsOpen(false)}>
+                  <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
+                      <GraduationCap className="h-5 w-5 text-primary-foreground" />
+                  </div>
+                  <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+              </Link>
+              <div className="flex flex-col space-y-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className="text-base font-medium transition-colors hover:text-primary text-foreground/80"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <Separator className="my-2"/>
+                 {user ? (
+                   <div className="flex flex-col space-y-4">
+                      <Link href={getDashboardHref()} onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Dashboard</Link>
+                      <Link href={getProfileHref()} onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Profile</Link>
+                      <button onClick={() => { handleSignOut(); setIsOpen(false); }} className="text-left text-base font-medium transition-colors hover:text-primary text-foreground/80">Sign Out</button>
+                   </div>
+                 ) : (
+                   <div className="flex flex-col space-y-4">
+                     <Link href="/signin" onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Sign In</Link>
+                     <Link href="/" onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Sign Up</Link>
+                   </div>
+                 )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
