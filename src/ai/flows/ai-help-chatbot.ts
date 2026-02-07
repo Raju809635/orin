@@ -29,7 +29,6 @@ const prompt = ai.definePrompt({
   name: 'aiHelpChatbotPrompt',
   model: 'googleai/gemini-1.5-flash',
   input: {schema: AIHelpChatbotInputSchema},
-  output: {schema: AIHelpChatbotOutputSchema},
   prompt: `You are a chatbot designed to answer user questions about the Orin education mentoring marketplace platform.
 
   You have knowledge of the platform's features, booking process, pricing, and other relevant information.
@@ -40,6 +39,9 @@ const prompt = ai.definePrompt({
   - Mentors can create profiles, set their availability, and manage bookings.
   - The platform offers real-time chat for communication between students and mentors.
   - The platform commission is 20%.
+
+  You must respond with only a valid JSON object with a single key "response" containing your answer as a string.
+  Example: {"response": "To book a mentor, you can browse by category..."}
 
   Respond to the following user query:
   {{{query}}}
@@ -53,7 +55,8 @@ const aiHelpChatbotFlow = ai.defineFlow(
     outputSchema: AIHelpChatbotOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const result = await prompt(input);
+    const jsonString = result.text.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+    return JSON.parse(jsonString);
   }
 );

@@ -29,12 +29,13 @@ const prompt = ai.definePrompt({
   name: 'aiSmartSearchPrompt',
   model: 'googleai/gemini-1.5-flash',
   input: {schema: AISmartSearchInputSchema},
-  output: {schema: AISmartSearchOutputSchema},
   prompt: `You are a search assistant for a mentor marketplace.
 
   Based on the user's natural language query, extract the key criteria for filtering mentors.
   Consider subject, price range, exam type, rating, language, and experience level.
-  Return a string that represents the filter criteria that can be applied to search for mentors.
+  
+  You must respond with only a valid JSON object with a single key "filteredResults" containing the filter criteria as a string.
+  Example: {"filteredResults": "subject:Physics, rating:4+"}
 
   User Query: {{{query}}} `,
 });
@@ -46,7 +47,8 @@ const aiSmartSearchFlow = ai.defineFlow(
     outputSchema: AISmartSearchOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const result = await prompt(input);
+    const jsonString = result.text.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+    return JSON.parse(jsonString);
   }
 );

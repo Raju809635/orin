@@ -48,7 +48,6 @@ const prompt = ai.definePrompt({
   input: {schema: RecommendMentorsInputSchema.extend({
     mentors: z.any()
   })},
-  output: {schema: RecommendMentorsOutputSchema},
   prompt: `You are an AI mentor recommendation system. You will be provided with a student's academic goals, class level, and exam targets, and a list of available mentors.
   Based on this information, you will recommend up to 3 mentors that are best suited for the student from the provided list.
 
@@ -59,7 +58,10 @@ const prompt = ai.definePrompt({
   Available Mentors (JSON format):
   {{{json mentors}}}
 
-  Please provide a list of mentor recommendations with their match percentages and reasoning. The mentorId for each recommendation MUST be one of the IDs from the provided mentor list.
+  You must respond with only a valid JSON object with a single key "mentorRecommendations", which is an array of objects.
+  Each object in the array should have "mentorId" (string), "matchPercentage" (number), and "reason" (string).
+  The mentorId for each recommendation MUST be one of the IDs from the provided mentor list.
+  Example: {"mentorRecommendations": [{"mentorId": "1", "matchPercentage": 95, "reason": "Expert in JEE Physics and has a high rating."}]}
   `,
 });
 
@@ -70,7 +72,10 @@ const recommendMentorsFlow = ai.defineFlow(
     outputSchema: RecommendMentorsOutputSchema,
   },
   async input => {
-    const {output} = await prompt({...input, mentors});
+    const result = await prompt({...input, mentors});
+    const jsonString = result.text.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+    const output = JSON.parse(jsonString);
+
     if (!output || !output.mentorRecommendations) {
       return { mentorRecommendations: [] };
     }
