@@ -625,326 +625,113 @@
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Stores user profiles. Accessible by the user and admins.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            }
-          ]
-        }
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
       },
-      {
-        "path": "/users/{userId}/student_profile",
-        "definition": {
-          "entityName": "StudentProfile",
-          "schema": {
-            "$ref": "#/backend/entities/StudentProfile"
-          },
-          "description": "Stores student profile information. Accessible by the student and admins.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            }
-          ]
-        }
+      "description": "Stores user profiles. Accessible by the user and admins."
+    },
+    "/users/{userId}/student_profile": {
+      "schema": {
+        "$ref": "#/entities/StudentProfile"
       },
-      {
-        "path": "/users/{userId}/mentor_profile",
-        "definition": {
-          "entityName": "MentorProfile",
-          "schema": {
-            "$ref": "#/backend/entities/MentorProfile"
-          },
-          "description": "Stores mentor profile information. Accessible by the mentor and admins.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            }
-          ]
-        }
+      "description": "Stores student profile information. Accessible by the student and admins."
+    },
+    "/users/{userId}/mentor_profile": {
+      "schema": {
+        "$ref": "#/entities/MentorProfile"
       },
-      {
-        "path": "/categories/{categoryId}",
-        "definition": {
-          "entityName": "Category",
-          "schema": {
-            "$ref": "#/backend/entities/Category"
-          },
-          "description": "Stores categories for subjects and mentors. Publicly readable.",
-          "params": [
-            {
-              "name": "categoryId",
-              "description": "The unique identifier for the category."
-            }
-          ]
-        }
+      "description": "Stores mentor profile information. Accessible by the mentor and admins."
+    },
+    "/categories/{categoryId}": {
+      "schema": {
+        "$ref": "#/entities/Category"
       },
-      {
-        "path": "/categories/{categoryId}/subjects/{subjectId}",
-        "definition": {
-          "entityName": "Subject",
-          "schema": {
-            "$ref": "#/backend/entities/Subject"
-          },
-          "description": "Stores subjects within a category. Publicly readable.",
-          "params": [
-            {
-              "name": "categoryId",
-              "description": "The unique identifier for the category."
-            },
-            {
-              "name": "subjectId",
-              "description": "The unique identifier for the subject."
-            }
-          ]
-        }
+      "description": "Stores categories for subjects and mentors. Publicly readable."
+    },
+    "/categories/{categoryId}/subjects/{subjectId}": {
+      "schema": {
+        "$ref": "#/entities/Subject"
       },
-      {
-        "path": "/categories/{categoryId}/exams/{examId}",
-        "definition": {
-          "entityName": "Exam",
-          "schema": {
-            "$ref": "#/backend/entities/Exam"
-          },
-          "description": "Stores exam specifications linked to a category. Publicly readable.",
-          "params": [
-            {
-              "name": "categoryId",
-              "description": "The unique identifier for the category."
-            },
-            {
-              "name": "examId",
-              "description": "The unique identifier for the exam."
-            }
-          ]
-        }
+      "description": "Stores subjects within a category. Publicly readable."
+    },
+    "/categories/{categoryId}/exams/{examId}": {
+      "schema": {
+        "$ref": "#/entities/Exam"
       },
-      {
-        "path": "/mentor_expertise/{mentorExpertiseId}",
-        "definition": {
-          "entityName": "MentorExpertise",
-          "schema": {
-            "$ref": "#/backend/entities/MentorExpertise"
-          },
-          "description": "Junction table linking mentors to subjects and exams. Accessible by admins.",
-          "params": [
-            {
-              "name": "mentorExpertiseId",
-              "description": "The unique identifier for the mentor expertise."
-            }
-          ]
-        }
+      "description": "Stores exam specifications linked to a category. Publicly readable."
+    },
+    "/mentor_expertise/{mentorExpertiseId}": {
+      "schema": {
+        "$ref": "#/entities/MentorExpertise"
       },
-      {
-        "path": "/mentor_categories/{mentorCategoryId}",
-        "definition": {
-          "entityName": "MentorCategory",
-          "schema": {
-            "$ref": "#/backend/entities/MentorCategory"
-          },
-          "description": "Junction table for mentor category associations. Accessible by admins.",
-          "params": [
-            {
-              "name": "mentorCategoryId",
-              "description": "The unique identifier for the mentor category."
-            }
-          ]
-        }
+      "description": "Junction table linking mentors to subjects and exams. Accessible by admins."
+    },
+    "/mentor_categories/{mentorCategoryId}": {
+      "schema": {
+        "$ref": "#/entities/MentorCategory"
       },
-      {
-        "path": "/users/{mentorId}/timeslots/{timeSlotId}",
-        "definition": {
-          "entityName": "TimeSlot",
-          "schema": {
-            "$ref": "#/backend/entities/TimeSlot"
-          },
-          "description": "Stores time slots for mentor availability. Accessible by the mentor and admins.",
-          "params": [
-            {
-              "name": "mentorId",
-              "description": "The unique identifier for the mentor."
-            },
-            {
-              "name": "timeSlotId",
-              "description": "The unique identifier for the time slot."
-            }
-          ]
-        }
+      "description": "Junction table for mentor category associations. Accessible by admins."
+    },
+    "/users/{mentorId}/timeslots/{timeSlotId}": {
+      "schema": {
+        "$ref": "#/entities/TimeSlot"
       },
-      {
-        "path": "/bookings/{bookingId}",
-        "definition": {
-          "entityName": "Booking",
-          "schema": {
-            "$ref": "#/backend/entities/Booking"
-          },
-          "description": "Stores booking information. Includes denormalized 'studentId' and 'mentorId' for authorization independence. Accessible by the student, the mentor and admins.",
-          "params": [
-            {
-              "name": "bookingId",
-              "description": "The unique identifier for the booking."
-            }
-          ]
-        }
+      "description": "Stores time slots for mentor availability. Accessible by the mentor and admins."
+    },
+    "/bookings/{bookingId}": {
+      "schema": {
+        "$ref": "#/entities/Booking"
       },
-      {
-        "path": "/bookings/{bookingId}/reviews/{reviewId}",
-        "definition": {
-          "entityName": "Review",
-          "schema": {
-            "$ref": "#/backend/entities/Review"
-          },
-          "description": "Stores reviews given by a student for a mentor. Accessible by the student, the mentor and admins.",
-          "params": [
-            {
-              "name": "bookingId",
-              "description": "The unique identifier for the booking."
-            },
-            {
-              "name": "reviewId",
-              "description": "The unique identifier for the review."
-            }
-          ]
-        }
+      "description": "Stores booking information. Includes denormalized 'studentId' and 'mentorId' for authorization independence. Accessible by the student, the mentor and admins."
+    },
+    "/bookings/{bookingId}/reviews/{reviewId}": {
+      "schema": {
+        "$ref": "#/entities/Review"
       },
-      {
-        "path": "/users/{studentId}/favorites/{favoriteId}",
-        "definition": {
-          "entityName": "Favorite",
-          "schema": {
-            "$ref": "#/backend/entities/Favorite"
-          },
-          "description": "Stores a student's favorite mentors. Accessible by the student and admins.",
-          "params": [
-            {
-              "name": "studentId",
-              "description": "The unique identifier for the student."
-            },
-            {
-              "name": "favoriteId",
-              "description": "The unique identifier for the favorite."
-            }
-          ]
-        }
+      "description": "Stores reviews given by a student for a mentor. Accessible by the student, the mentor and admins."
+    },
+    "/users/{studentId}/favorites/{favoriteId}": {
+      "schema": {
+        "$ref": "#/entities/Favorite"
       },
-      {
-        "path": "/bookings/{bookingId}/chat_messages/{messageId}",
-        "definition": {
-          "entityName": "ChatMessage",
-          "schema": {
-            "$ref": "#/backend/entities/ChatMessage"
-          },
-          "description": "Stores chat messages between a student and a mentor. Accessible by the student, the mentor and admins.",
-          "params": [
-            {
-              "name": "bookingId",
-              "description": "The unique identifier for the booking."
-            },
-            {
-              "name": "messageId",
-              "description": "The unique identifier for the chat message."
-            }
-          ]
-        }
+      "description": "Stores a student's favorite mentors. Accessible by the student and admins."
+    },
+    "/bookings/{bookingId}/chat_messages/{messageId}": {
+      "schema": {
+        "$ref": "#/entities/ChatMessage"
       },
-      {
-        "path": "/users/{mentorId}/resources/{resourceId}",
-        "definition": {
-          "entityName": "Resource",
-          "schema": {
-            "$ref": "#/backend/entities/Resource"
-          },
-          "description": "Stores resources uploaded by a mentor. Accessible by the mentor and admins.",
-          "params": [
-            {
-              "name": "mentorId",
-              "description": "The unique identifier for the mentor."
-            },
-            {
-              "name": "resourceId",
-              "description": "The unique identifier for the resource."
-            }
-          ]
-        }
+      "description": "Stores chat messages between a student and a mentor. Accessible by the student, the mentor and admins."
+    },
+    "/users/{mentorId}/resources/{resourceId}": {
+      "schema": {
+        "$ref": "#/entities/Resource"
       },
-      {
-        "path": "/transactions/{transactionId}",
-        "definition": {
-          "entityName": "Transaction",
-          "schema": {
-            "$ref": "#/backend/entities/Transaction"
-          },
-          "description": "Stores transaction information for payment tracking. Accessible by admins.",
-          "params": [
-            {
-              "name": "transactionId",
-              "description": "The unique identifier for the transaction."
-            }
-          ]
-        }
+      "description": "Stores resources uploaded by a mentor. Accessible by the mentor and admins."
+    },
+    "/transactions/{transactionId}": {
+      "schema": {
+        "$ref": "#/entities/Transaction"
       },
-      {
-        "path": "/coupon_codes/{couponCodeId}",
-        "definition": {
-          "entityName": "CouponCode",
-          "schema": {
-            "$ref": "#/backend/entities/CouponCode"
-          },
-          "description": "Stores coupon codes for discounts. Accessible by admins.",
-          "params": [
-            {
-              "name": "couponCodeId",
-              "description": "The unique identifier for the coupon code."
-            }
-          ]
-        }
+      "description": "Stores transaction information for payment tracking. Accessible by admins."
+    },
+    "/coupon_codes/{couponCodeId}": {
+      "schema": {
+        "$ref": "#/entities/CouponCode"
       },
-      {
-        "path": "/notifications/{notificationId}",
-        "definition": {
-          "entityName": "Notification",
-          "schema": {
-            "$ref": "#/backend/entities/Notification"
-          },
-          "description": "Stores notifications for email/in-app notifications. Accessible by admins.",
-          "params": [
-            {
-              "name": "notificationId",
-              "description": "The unique identifier for the notification."
-            }
-          ]
-        }
+      "description": "Stores coupon codes for discounts. Accessible by admins."
+    },
+    "/notifications/{notificationId}": {
+      "schema": {
+        "$ref": "#/entities/Notification"
       },
-      {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "entityName": "admin_role",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Documents in this collection represent admin users.  The *existence* of a document indicates admin role.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The Firestore data structure is designed to support the Orin platform's mentoring marketplace, focusing on security, scalability, and debuggability. The design adheres to Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), QAPs (Rules are not Filters), and Invariants.\n\n**Authorization Independence:**\nAuthorization independence is achieved by denormalizing authorization-related data. For example, the `Booking` documents duplicate `studentId` and `mentorId`. This eliminates the need for `get()` calls in security rules to verify user roles or relationships, enabling atomic operations and improving security rule performance.\n\n**Structural Segregation (Homogeneous Security Posture):**\nThe database structure segregates data based on access needs. User profiles are stored under `/users/{userId}`, ensuring that only the user and admins can access them. Mentor-specific data like `/users/{mentorId}/timeslots` and `/users/{mentorId}/resources` are organized under the mentor's profile, clearly defining ownership and access.\n\n**Access Modeling (Standardization and Consistency):**\nThe design uses consistent patterns for authorization:\n\n*   **Private Data:** User profiles and related data (student profiles, mentor profiles) are stored using path-based ownership under `/users/{userId}`.\n*   **User-Owned Data:** Data related to users such as time slots (`/users/{mentorId}/timeslots/{timeslotId}`), resources (`/users/{mentorId}/resources/{resourceId}`), bookings (`/users/{studentId}/bookings/{bookingId}`) are organized hierarchically.\n*   **Collaborative Data:** The chat messages are stored in `/bookings/{bookingId}/chat_messages/{messageId}`, this is fine since a user must have an existing booking to be able to chat, which also creates a paper trail for admins in case of disputes.\n*   **Global Roles (DBAC):** While the schema includes a `role` field in the `User` document, it is recommended to manage admin roles via the existence of documents in a dedicated `/roles_admin/{uid}` collection. This simplifies security rules and avoids content-based authorization.\n\n**QAPs (Rules are not Filters):**\nThe data structure supports secure `list` operations by avoiding reliance on filtering data based on user roles in the rules. For instance, listing mentors is enabled through `/users/{mentorId}`. If a global list of mentors is required without authentication, a separate collection `/mentors` containing a subset of safe data from `/users/{mentorId}` could be maintained (This would need to be kept in sync via a cloud function on writes to `/users/{mentorId}`).\n\n**Data Clarity and Predictability:**\n\n*   **Explicit State Modeling:** The `Booking` entity has a `status` field that explicitly models the state of a booking (pending, confirmed, completed, cancelled), improving clarity and avoiding complex logic based on multiple fields.\n*   **Predictable Schema:** The schema uses static keys and avoids dynamic keys. Arrays of objects are used where applicable.\n*   **Radical Consistency:** Naming conventions are standardized, with authorization fields consistently named (e.g., `userId`, `mentorId`, `studentId`)."
+      "description": "Stores notifications for email/in-app notifications. Accessible by admins."
+    },
+    "/roles_admin/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "Documents in this collection represent admin users.  The *existence* of a document indicates admin role."
+    }
   }
 }
-
-    

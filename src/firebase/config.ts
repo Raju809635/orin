@@ -1,8 +1,8 @@
 export const firebaseConfig = {
-  projectId: "orin-486608",
-  appId: "1:181473633960:web:a31475e7a3a5f9731c449d",
-  apiKey: "AIzaSyAvYc6zW5GdVDT25MZr_JNAVpdt962zRso",
+  apiKey: "AIzaSyBrx3usV0yDvq2Z3jCQQYQ65qR0EWaP3q4",
   authDomain: "orin-486608.firebaseapp.com",
+  projectId: "orin-486608",
   storageBucket: "orin-486608.appspot.com",
-  messagingSenderId: "181473633960"
+  messagingSenderId: "112825774144",
+  appId: "1:112825774144:web:ba1c24a472eed1307fafa5"
 };
