@@ -23,9 +23,13 @@ export const useUser = (): UseUserResult => {
   const { data: userData, isLoading: isDocLoading } = useDoc<User>(userDocRef);
 
   const user = useMemo(() => {
-    if (!firebaseUser) return null;
+    // A complete user object requires both Firebase Auth data and the role from Firestore.
+    // If we don't have the userData yet, we don't have the role, so we can't construct a valid User.
+    if (!firebaseUser || !userData) {
+      return null;
+    }
 
-    // The user object from Firebase Auth has `uid`, but our app model uses `id`.
+    // The user object from Firebase Auth has standard properties.
     // The `userData` from Firestore contains the `role` and other profile info.
     const finalUser: User = {
       // Start with auth data, mapping uid to id
@@ -37,7 +41,7 @@ export const useUser = (): UseUserResult => {
       // It will overwrite properties from auth if they exist in the Firestore doc,
       // which is often desired (e.g., if user updates their display name in their profile).
       // Most importantly, it adds the `role`.
-      ...(userData || {}),
+      ...userData,
     };
     return finalUser;
   }, [firebaseUser, userData]);

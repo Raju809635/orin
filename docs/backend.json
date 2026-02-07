@@ -19,6 +19,15 @@
           "description": "User's email address.",
           "format": "email"
         },
+        "displayName": {
+          "type": "string",
+          "description": "User's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile picture.",
+          "format": "uri"
+        },
         "profileDetails": {
           "type": "string",
           "description": "User's profile details."
@@ -31,9 +40,7 @@
       "required": [
         "id",
         "role",
-        "email",
-        "profileDetails",
-        "status"
+        "email"
       ]
     },
     "StudentProfile": {
