@@ -46,18 +46,17 @@ export default function SignUpPage() {
 
         try {
           await setDoc(userDocRef, userData, { merge: true });
+          if (role === 'student') {
+            router.push('/create-student-profile');
+          } else {
+            router.push('/create-mentor-profile');
+          }
         } catch (firestoreError) {
           throw new FirestorePermissionError({
             path: userDocRef.path,
             operation: 'create',
             requestResourceData: userData,
           });
-        }
-        
-        if (role === 'student') {
-          router.push('/create-student-profile');
-        } else {
-          router.push('/create-mentor-profile');
         }
       }
     } catch (error: any) {
@@ -105,18 +104,17 @@ export default function SignUpPage() {
 
         try {
             await setDoc(userDocRef, userData);
+            if (role === 'student') {
+              router.push('/create-student-profile');
+            } else {
+              router.push('/create-mentor-profile');
+            }
         } catch (firestoreError) {
             throw new FirestorePermissionError({
                 path: userDocRef.path,
                 operation: 'create',
                 requestResourceData: userData,
             });
-        }
-
-        if (role === 'student') {
-          router.push('/create-student-profile');
-        } else {
-          router.push('/create-mentor-profile');
         }
       }
     } catch (error: any) {
