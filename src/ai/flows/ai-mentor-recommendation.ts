@@ -8,7 +8,7 @@
  * - RecommendMentorsOutput - The return type for the recommendMentors function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai';
 import {z} from 'genkit';
 import {mentors} from '@/lib/mentors-data';
 
