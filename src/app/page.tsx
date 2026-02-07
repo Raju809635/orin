@@ -10,11 +10,16 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
-import { signInWithGoogle } from "@/lib/firebase/auth";
+import { signInWithGoogle, signUpWithEmailAndPassword } from "@/lib/firebase/auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SignUpPage() {
   const [role, setRole] = useState('student');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleGoogleSignUp = async () => {
     const user = await signInWithGoogle();
@@ -24,6 +29,47 @@ export default function SignUpPage() {
       } else {
         router.push('/create-mentor-profile');
       }
+    } else {
+      toast({
+        title: "Sign up failed",
+        description: "Could not sign up with Google. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEmailSignUp = async () => {
+    if (password !== confirmPassword) {
+      toast({
+        title: "Passwords do not match",
+        description: "Please make sure your passwords match.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (password.length < 6) {
+        toast({
+            title: "Password too short",
+            description: "Password should be at least 6 characters.",
+            variant: "destructive",
+        });
+        return;
+    }
+
+    const { user, error } = await signUpWithEmailAndPassword(email, password);
+
+    if (user) {
+      if (role === 'student') {
+        router.push('/create-student-profile');
+      } else {
+        router.push('/create-mentor-profile');
+      }
+    } else if (error) {
+      toast({
+        title: "Sign up failed",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -47,15 +93,15 @@ export default function SignUpPage() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" placeholder="Enter your email" />
+                <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="Create a password" />
+                <Input id="password" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
                <div className="space-y-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input id="confirm-password" type="password" placeholder="Confirm your password" />
+                <Input id="confirm-password" type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
               </div>
               <div className="space-y-2">
                  <Label>I am a</Label>
@@ -71,9 +117,7 @@ export default function SignUpPage() {
                   </RadioGroup>
               </div>
               
-              <Link href={role === 'student' ? '/create-student-profile' : '/create-mentor-profile'} className="block w-full">
-                <Button className="w-full h-12">Sign Up</Button>
-              </Link>
+              <Button className="w-full h-12" onClick={handleEmailSignUp}>Sign Up</Button>
               
                <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
