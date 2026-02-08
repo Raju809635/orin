@@ -1,7 +1,7 @@
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { Briefcase, FileText, Landmark, Goal, GraduationCap } from "lucide-react";
+import { Award, BookOpen, GraduationCap, TrendingUp, Users } from "lucide-react";
 import Link from 'next/link';
 import {
   Card,
@@ -9,13 +9,12 @@ import {
 } from "@/components/ui/card";
 import React from "react";
 
-// Mock data
 const categories = [
-  { name: "School", description: "Grades 1-12, board prep, and Olympiads.", icon: <GraduationCap /> },
-  { name: "Intermediate", description: "Competitive exams like JEE, NEET, and EAMCET.", icon: <FileText /> },
-  { name: "B.Tech/College", description: "Coding, development, and career skills.", icon: <Briefcase /> },
-  { name: "Law", description: "CLAT, judiciary coaching, and law subjects.", icon: <Landmark /> },
-  { name: "Govt. Exams", description: "UPSC, SSC, Banking, and other state exams.", icon: <Goal /> },
+  { name: "School (1-10)", icon: <BookOpen />, color: "bg-chart-1" },
+  { name: "Inter (11-12)", icon: <GraduationCap />, color: "bg-chart-2" },
+  { name: "BTech/Skills", icon: <Award />, color: "bg-chart-3" },
+  { name: "Law", icon: <Users />, color: "bg-chart-4" },
+  { name: "Govt Exams", icon: <TrendingUp />, color: "bg-chart-5" },
 ];
 
 
@@ -55,18 +54,18 @@ export default function HomePage() {
           <div className="container">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-3xl md:text-4xl font-bold font-headline">Choose Your Category</h2>
-              <p className="mt-4 text-muted-foreground">Find mentors in a wide range of subjects and exam preparations.</p>
+              <p className="mt-4 text-muted-foreground">Find specialized mentors for your specific needs</p>
             </div>
             <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
               {categories.map((category) => (
                 <Link href={`/mentors?category=${category.name.toLowerCase()}`} key={category.name}>
-                  <Card className="group text-center hover:bg-primary/5 hover:border-primary/20 transition-all">
-                    <CardContent className="p-6">
-                      <div className="mx-auto text-primary w-12 h-12 flex items-center justify-center">
-                        {React.cloneElement(category.icon, { className: 'w-8 h-8' })}
+                  <Card className="group overflow-hidden text-center shadow-md hover:shadow-lg transition-all rounded-xl">
+                    <div className={`h-1.5 ${category.color}`} />
+                    <CardContent className="p-6 pt-6">
+                      <div className={`mx-auto ${category.color} w-16 h-16 rounded-2xl flex items-center justify-center`}>
+                        {React.cloneElement(category.icon, { className: 'w-8 h-8 text-white' })}
                       </div>
-                      <h3 className="mt-4 font-semibold font-headline">{category.name}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{category.description}</p>
+                      <h3 className="mt-4 font-semibold font-headline text-lg">{category.name}</h3>
                     </CardContent>
                   </Card>
                 </Link>
@@ -76,7 +75,7 @@ export default function HomePage() {
         </section>
 
         {/* CTA Section */}
-        <section className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
+        <section className="bg-gradient-to-r from-blue-500 to-purple-600 text-primary-foreground">
           <div className="container py-20 text-center">
             <h2 className="text-4xl md:text-5xl font-bold font-headline">Ready to Start Your Learning Journey?</h2>
             <p className="mt-4 text-lg max-w-3xl mx-auto opacity-90">Join thousands of students finding success with expert mentors</p>
