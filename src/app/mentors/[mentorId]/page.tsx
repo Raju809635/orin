@@ -1,3 +1,6 @@
+"use client";
+
+import React from "react";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { mentors } from "@/lib/mentors-data";
@@ -11,6 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 
 export default function MentorProfilePage({ params }: { params: { mentorId: string } }) {
   const mentor = mentors.find(m => m.id.toString() === params.mentorId);
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
 
   if (!mentor) {
     notFound();
@@ -75,7 +79,8 @@ export default function MentorProfilePage({ params }: { params: { mentorId: stri
                 <CardContent className="flex justify-center">
                     <Calendar
                         mode="single"
-                        selected={new Date()}
+                        selected={date}
+                        onSelect={setDate}
                         className="rounded-md border p-0"
                         disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
                     />
