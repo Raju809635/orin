@@ -6,71 +6,65 @@ Welcome to the Orin application! This document provides a comprehensive overview
 
 Orin is a marketplace designed to connect students with expert mentors. The platform supports two primary user roles:
 
-1.  **Student:** A user looking for guidance and mentorship. This is the default role for all new users.
+1.  **Student:** A user looking for guidance and mentorship. This is the **default role** for all new users.
 2.  **Mentor:** An expert who has been approved to offer mentorship services on the platform.
 
 ---
 
-## Student User Flow
+## Student Experience
 
-This is the primary journey for a user seeking mentorship.
+A **student** is any user who has signed up on the platform. This is the primary user journey for someone seeking mentorship.
 
-### 1. Sign Up & Profile Creation
-- **Sign Up:** A new user can create an account using their email/password or by signing in with Google. All new accounts default to the **student** role.
-- **Create Profile:** After signing up, the user is immediately redirected to the `/create-student-profile` page to enter their name and academic goals. This step is crucial for personalizing their experience.
-- **Dashboard:** Upon completing their profile, they are taken to their personal **Student Dashboard**.
+### Accessible Pages & What They See:
 
-### 2. Finding a Mentor
-- **Browse Mentors:** Students can visit the `/mentors` page to see a list of all available mentors on the platform. This list is dynamically loaded from the Firestore database.
-- **Filter & Search:** The "Browse Mentors" page includes a sidebar with filters for category, price, rating, and experience, allowing students to narrow down their search.
-- **Categories Page:** Students can also explore mentors through the `/categories` page, which groups experts by subject area (e.g., School, Law, Government Exams).
+- **`/` (Sign Up):** The landing page for new users to create an account.
+- **`/signin`:** The page to log into an existing account.
+- **`/create-student-profile`:** After signing up, new users are directed here to enter their name and academic goals. This is a mandatory step for all new users.
+- **`/home`:** The main marketing and welcome page for authenticated users.
+- **`/dashboard` ("Your Dashboard"):** This is the student's central hub.
+    - They see their name and a welcome message.
+    - A list of "Featured Mentors" is displayed for them to explore.
+    - "My Sessions" section shows their upcoming and past mentorship sessions.
+- **`/mentors`:** The main directory where students can find mentors.
+    - They see a grid of all available mentors.
+    - They can use a sidebar with filters (Category, Price, Rating, etc.) to narrow down their search.
+- **`/mentors/[mentorId]`:** A detailed profile page for a specific mentor.
+    - Students can view the mentor's photo, name, professional role, company, biography, and expertise.
+    - They can see a calendar to check the mentor's availability and book a session.
+- **`/categories`:** An alternative way to discover mentors, grouped by subject area (e.g., School, Law, Government Exams).
+- **`/become-a-mentor`:** The page where a student can apply to become a mentor. They see a form to submit their qualifications and experience.
+- **`/profile`:** The page where a student can update their personal information, such as their display name and profile picture.
+- **Static Pages:** Students can access all informational pages like `/about`, `/contact`, `/blog`, `/privacy`, `/security`, and `/terms`.
 
-### 3. Booking a Session
-- **Mentor Profile:** Clicking on a mentor's card leads to their detailed profile page (`/mentors/[mentorId]`). Here, students can learn more about the mentor's expertise, experience, and see their availability.
-- **Booking:** The profile page includes a calendar and time slots. A student can select a date and time and click "Book Session" to schedule a mentorship session. *(Note: The final booking and payment logic is a future implementation)*.
-
-### 4. Your Dashboard (Student View)
-The dashboard at `/dashboard` is the central hub for students. It contains:
-- **Featured Mentors:** Recommendations for mentors.
-- **My Sessions:** Lists of upcoming and past mentorship sessions.
-
----
-
-## Mentor User Flow
-
-This flow is for experts who want to offer their services on the platform.
-
-### 1. Applying to Become a Mentor
-- **Initial Sign-Up:** A potential mentor first signs up as a regular user, which assigns them the "student" role by default.
-- **Application:** They navigate to the `/become-a-mentor` page and submit an application form.
-- **Automatic Approval:** In the current implementation, the application is **automatically approved**. The user's role in the database is immediately updated from "student" to **mentor**.
-
-### 2. Post-Approval Experience
-- **Immediate Redirection:** Once the application is submitted, the user is redirected to the `/signin` page, which intelligently handles their new role.
-- **Dashboard Selection:** The sign-in page recognizes their "mentor" role and presents them with two choices: "Go to Your Dashboard" (the student view) or "Go to Mentor Dashboard." This allows mentors to also use the platform as students if they wish.
-
-### 3. Managing the Mentor Profile
-- **Visibility:** As soon as a user's role is updated to "mentor", their profile automatically appears on the public `/mentors` listing page for all students to see.
-- **Profile Updates:** Mentors can update their display name and profile picture from the `/profile` page. This information is reflected on their public mentor card and profile page.
-
-### 4. The Mentor Dashboard
-The Mentor Dashboard (`/mentor-dashboard`) is the control center for mentors.
-- It displays a list of their students and upcoming sessions.
-- From the header, mentors have a dedicated dropdown menu that allows them to easily switch between their **Mentor Dashboard** and **Your Dashboard** (the student view).
+### Navigation (Header):
+- For a student, the main button in the header is **"Dashboard,"** which links to `/dashboard`.
+- The user settings dropdown menu provides a link to their **"Profile"**.
 
 ---
 
-## Key Pages & Features
+## Mentor Experience
 
-- **`/` (Sign Up):** The default landing page for new, unauthenticated users.
-- **`/signin`:** The sign-in page. It also acts as a router for logged-in mentors, directing them to the dashboard selection screen.
-- **`/home`:** The main landing page for authenticated users.
-- **`/mentors`:** The main directory where students can find and filter mentors.
-- **`/mentors/[mentorId]`:** The detailed public profile page for a single mentor.
-- **`/dashboard`:** The personalized dashboard for students (referred to as "Your Dashboard").
-- **`/mentor-dashboard`:** The personalized dashboard for **mentors**.
-- **`/profile`:** The page where any logged-in user (student or mentor) can edit their personal profile information.
-- **`/become-a-mentor`:** The application page for students who wish to become mentors. It intelligently shows a status page to users who are already mentors.
+A **mentor** is a user who has completed the "Become a Mentor" application and has been approved. Mentors can also use the platform as students.
+
+### Accessible Pages & What They See:
+
+- **All Student Pages:** A mentor has access to every page a student can see. They can browse and book other mentors, view their own student dashboard, etc.
+- **`/mentor-dashboard`:** This is the control center exclusive to mentors.
+    - They see a welcome message tailored to them.
+    - A list of "My Students" is displayed.
+    - They can view their upcoming and past sessions from the perspective of a mentor.
+- **`/become-a-mentor`:** If a user who is already a mentor visits this page, they do not see the application form. Instead, they see a status message: **"You're Already a Mentor,"** with a button to go directly to their Mentor Dashboard.
+- **`/signin`:** This page is intelligent. If a logged-in mentor visits this URL, they are immediately shown a screen to choose between "Go to Your Dashboard" (the student view) and "Go to Mentor Dashboard."
+- **`/profile`:** Like students, mentors can edit their display name and profile picture here. These changes are reflected on their public mentor card and profile page.
+- **Public Visibility:** As soon as a user becomes a mentor, their profile is automatically published and visible to all students on the `/mentors` page.
+
+### Navigation (Header):
+- The header is different for mentors. The user settings dropdown menu contains two distinct options:
+    1.  **"Your Dashboard"**: Links to `/dashboard` (their student view).
+    2.  **"Mentor Dashboard"**: Links to `/mentor-dashboard`.
+- This allows them to easily switch between their two roles at any time, from any page.
+
+---
 
 ## Technical Stack
 
