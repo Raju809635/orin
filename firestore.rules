@@ -240,7 +240,7 @@ service cloud.firestore {
      */
     match /bookings/{bookingId} {
       allow get: if (isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId))) || isAdmin();
-      allow list: if isSignedIn();
+      allow list: if request.auth != null;
       allow create: if isSignedIn() && isOwner(request.resource.data.studentId);
       allow update: if isSignedIn() && (isOwner(request.resource.data.studentId) || isOwner(resource.data.mentorId));
       allow delete: if isSignedIn() && (isOwner(request.resource.data.studentId) || isOwner(resource.data.mentorId));
