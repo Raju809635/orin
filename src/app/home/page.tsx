@@ -80,13 +80,6 @@ export default function HomePage() {
           <div className="container py-20 text-center">
             <h2 className="text-4xl md:text-5xl font-bold font-headline">Ready to Start Your Learning Journey?</h2>
             <p className="mt-4 text-lg max-w-3xl mx-auto opacity-90">Join thousands of students finding success with expert mentors</p>
-            <div className="mt-8">
-              <Link href="/">
-                <Button size="lg" className="h-14 px-8 text-base bg-white text-primary hover:bg-gray-200 rounded-full shadow-lg">
-                  Get Started Free
-                </Button>
-              </Link>
-            </div>
           </div>
         </section>
       </main>
