@@ -43,9 +43,7 @@ const Header = () => {
   }
 
   const getProfileHref = () => {
-    if (!user) return "/";
-    // The profile pages are for initial setup. After that, the user's dashboard serves as their profile hub.
-    return '/dashboard';
+    return '/profile';
   }
 
   const getInitials = (name?: string | null) => {
@@ -139,15 +137,15 @@ const Header = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
-              <SheetHeader>
-                <SheetTitle>
-                   <Link href="/home" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-                      <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
-                          <GraduationCap className="h-5 w-5 text-primary-foreground" />
-                      </div>
-                      <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
-                  </Link>
-                </SheetTitle>
+               <SheetHeader>
+                 <SheetTitle>
+                    <Link href="/home" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
+                        <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
+                            <GraduationCap className="h-5 w-5 text-primary-foreground" />
+                        </div>
+                        <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+                    </Link>
+                  </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col space-y-4 mt-6">
                 {navLinks.map((link) => (
