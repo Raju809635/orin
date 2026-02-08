@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, GraduationCap, LayoutDashboard, User as UserIcon, LogOut } from "lucide-react";
+import { Menu, GraduationCap, LayoutDashboard, User as UserIcon, LogOut, Settings, Moon, Sun } from "lucide-react";
 import { useAuth, useUser } from "@/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
 import {
@@ -16,15 +16,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "../ui/skeleton";
 import { Separator } from "../ui/separator";
+import { useTheme } from "next-themes";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
     await firebaseSignOut(auth);
@@ -33,7 +36,7 @@ const Header = () => {
 
   const navLinks = [
     { href: "/home", label: "Home" },
-    { href: "/mentors", label: "Categories" },
+    { href: "/categories", label: "Categories" },
     { href: "/mentors", label: "Browse Mentors" },
     { href: "/become-a-mentor", label: "Become a Mentor" },
   ];
@@ -48,15 +51,6 @@ const Header = () => {
     return '/profile';
   }
 
-  const getInitials = (name?: string | null) => {
-    if (!name) return 'U';
-    const nameParts = name.split(' ');
-    if (nameParts.length > 1) {
-      return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`;
-    }
-    return name.slice(0, 2);
-  }
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
@@ -65,7 +59,7 @@ const Header = () => {
             <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
                 <GraduationCap className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+            <span className="font-bold font-headline text-2xl tracking-tighter">MentorBridge</span>
           </Link>
         </div>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -89,11 +83,9 @@ const Header = () => {
                 </Link>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
-                            <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
-                        </Avatar>
+                        <Button variant="ghost" size="icon">
+                            <Settings className="h-5 w-5" />
+                            <span className="sr-only">Settings</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -111,6 +103,21 @@ const Header = () => {
                             <UserIcon className="mr-2 h-4 w-4" />
                             <span>Profile</span>
                           </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            <div className="flex items-center justify-between w-full">
+                                <Label htmlFor="dark-mode-dropdown" className="flex items-center gap-2 cursor-pointer text-sm font-normal">
+                                    {theme === 'dark' ? <Moon className="h-4 w-4"/> : <Sun className="h-4 w-4"/>}
+                                    <span>Dark Mode</span>
+                                </Label>
+                                <Switch
+                                    id="dark-mode-dropdown"
+                                    checked={theme === "dark"}
+                                    onCheckedChange={(checked) => {
+                                        setTheme(checked ? "dark" : "light")
+                                    }}
+                                />
+                            </div>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
@@ -144,7 +151,7 @@ const Header = () => {
                         <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
                             <GraduationCap className="h-5 w-5 text-primary-foreground" />
                         </div>
-                        <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+                        <span className="font-bold font-headline text-2xl tracking-tighter">MentorBridge</span>
                     </Link>
                   </SheetTitle>
               </SheetHeader>

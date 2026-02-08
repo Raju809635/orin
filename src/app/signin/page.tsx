@@ -57,6 +57,7 @@ export default function SignInPage() {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
     try {
+      if (!auth) return;
       const result = await signInWithPopup(auth, provider);
       await handleUserLogin(result.user);
     } catch (error: any) {
@@ -74,6 +75,7 @@ export default function SignInPage() {
   const handleEmailSignIn = async () => {
     setIsLoading(true);
     try {
+      if (!auth) return;
       const result = await signInWithEmailAndPassword(auth, email, password);
       await handleUserLogin(result.user);
     } catch (error: any) {
@@ -128,7 +130,7 @@ export default function SignInPage() {
               <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
                   <GraduationCap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+              <span className="font-bold font-headline text-2xl tracking-tighter">MentorBridge</span>
             </Link>
        </div>
         <div className="w-full max-w-md">

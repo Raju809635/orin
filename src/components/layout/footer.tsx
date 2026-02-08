@@ -12,7 +12,7 @@ const Footer = () => {
                 <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
                     <GraduationCap className="h-5 w-5 text-primary-foreground" />
                 </div>
-                <span className="font-bold font-headline text-2xl tracking-tighter text-white">ORIN</span>
+                <span className="font-bold font-headline text-2xl tracking-tighter text-white">MentorBridge</span>
             </Link>
             <p className="text-sm mt-4">Empowering students with expert mentorship for academic and career success.</p>
           </div>
@@ -20,7 +20,7 @@ const Footer = () => {
             <h3 className="font-semibold text-white mb-4 font-headline">For Students</h3>
             <ul className="space-y-3">
               <li><Link href="/mentors" className="text-sm hover:text-white transition-colors">Find Mentors</Link></li>
-              <li><Link href="/mentors" className="text-sm hover:text-white transition-colors">Categories</Link></li>
+              <li><Link href="/categories" className="text-sm hover:text-white transition-colors">Categories</Link></li>
               <li><Link href="#" className="text-sm hover:text-white transition-colors">How It Works</Link></li>
             </ul>
           </div>
@@ -42,7 +42,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-16 border-t border-gray-800 pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} ORIN. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} MentorBridge. All rights reserved.</p>
         </div>
       </div>
     </footer>

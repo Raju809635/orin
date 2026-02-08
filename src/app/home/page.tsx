@@ -1,21 +1,8 @@
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { Award, BookOpen, GraduationCap, TrendingUp, Users } from "lucide-react";
 import Link from 'next/link';
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
 import React from "react";
-
-const categories = [
-  { name: "School (1-10)", icon: <BookOpen />, color: "bg-chart-1" },
-  { name: "Inter (11-12)", icon: <GraduationCap />, color: "bg-chart-2" },
-  { name: "BTech/Skills", icon: <Award />, color: "bg-chart-3" },
-  { name: "Law", icon: <Users />, color: "bg-chart-4" },
-  { name: "Govt Exams", icon: <TrendingUp />, color: "bg-chart-5" },
-];
 
 
 export default function HomePage() {
@@ -45,31 +32,6 @@ export default function HomePage() {
                   </Button>
                 </Link>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Categories Section */}
-        <section className="py-16 md:py-24 bg-background">
-          <div className="container">
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold font-headline">Choose Your Category</h2>
-              <p className="mt-4 text-muted-foreground">Find specialized mentors for your specific needs</p>
-            </div>
-            <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-              {categories.map((category) => (
-                <Link href={`/mentors?category=${category.name.toLowerCase()}`} key={category.name}>
-                  <Card className="group overflow-hidden text-center shadow-md hover:shadow-lg transition-all rounded-xl">
-                    <div className={`h-1.5 ${category.color}`} />
-                    <CardContent className="p-6 pt-6">
-                      <div className={`mx-auto ${category.color} w-16 h-16 rounded-2xl flex items-center justify-center`}>
-                        {React.cloneElement(category.icon, { className: 'w-8 h-8 text-white' })}
-                      </div>
-                      <h3 className="mt-4 font-semibold font-headline text-lg">{category.name}</h3>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
             </div>
           </div>
         </section>

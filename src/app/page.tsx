@@ -58,6 +58,7 @@ export default function SignUpPage() {
   const handleGoogleSignUp = async () => {
     const provider = new GoogleAuthProvider();
     try {
+      if (!auth) return;
       const result = await signInWithPopup(auth, provider);
       saveUserDocument(result.user);
     } catch (error: any) {
@@ -98,6 +99,7 @@ export default function SignUpPage() {
     }
 
     try {
+      if (!auth) return;
       const result = await createUserWithEmailAndPassword(auth, email, password);
       saveUserDocument(result.user);
     } catch (error: any) {
@@ -117,14 +119,14 @@ export default function SignUpPage() {
                 <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
                     <GraduationCap className="h-5 w-5 text-primary-foreground" />
                 </div>
-                <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+                <span className="font-bold font-headline text-2xl tracking-tighter">MentorBridge</span>
            </Link>
        </div>
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-headline">Create an Account</CardTitle>
-            <CardDescription>Join Orin to find mentors or share your knowledge.</CardDescription>
+            <CardDescription>Join MentorBridge to find mentors or share your knowledge.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
