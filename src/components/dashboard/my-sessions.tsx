@@ -1,6 +1,9 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const upcomingSessions = [
   { id: 1, mentor: 'Sarah Johnson', subject: 'JEE Physics', date: 'August 5, 2024', time: '4:00 PM' },
@@ -13,6 +16,15 @@ const pastSessions = [
 ];
 
 export default function MySessions() {
+  const { toast } = useToast();
+
+  const handleJoinSession = () => {
+    toast({
+      title: "Feature not available",
+      description: "Video session functionality will be implemented soon.",
+    });
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -26,7 +38,7 @@ export default function MySessions() {
                   <p className="text-sm text-muted-foreground">with {session.mentor}</p>
                   <p className="text-sm text-muted-foreground">{session.date} at {session.time}</p>
                 </div>
-                <Button>Join Session</Button>
+                <Button onClick={handleJoinSession}>Join Session</Button>
               </CardContent>
             </Card>
           ))}

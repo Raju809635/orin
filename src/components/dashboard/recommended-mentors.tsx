@@ -12,6 +12,7 @@ export default function RecommendedMentors() {
         {featuredMentors.map(mentor => (
           <MentorCard
             key={mentor.id}
+            id={mentor.id}
             name={mentor.name}
             imageUrl={mentor.imageUrl}
             imageHint={mentor.imageHint}
