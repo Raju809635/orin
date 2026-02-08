@@ -54,13 +54,6 @@ service cloud.firestore {
     function isSignedIn() {
       return request.auth != null;
     }
-    
-    /**
-     * Redundant check to force rule redeployment.
-     */
-    function isLoggedIn() {
-        return request.auth != null;
-    }
 
     /**
      * Returns true if the requesting user has an admin role.
@@ -250,7 +243,7 @@ service cloud.firestore {
       // This rule allows any authenticated user to query the bookings collection.
       // Client-side queries are secured by `where` clauses, and the `get` rule above
       // ensures users can only read documents where they are a participant.
-      allow list: if isLoggedIn();
+      allow list: if request.auth != null;
       allow create: if isSignedIn() && isOwner(request.resource.data.studentId);
       allow update: if isSignedIn() && (isOwner(request.resource.data.studentId) || isOwner(request.resource.data.mentorId));
       allow delete: if isSignedIn() && (isOwner(request.resource.data.studentId) || isOwner(resource.data.mentorId));
