@@ -25,8 +25,10 @@ export default function ManageAvailability() {
   const [month, setMonth] = useState<Date | undefined>();
   const [minDate, setMinDate] = useState<Date | undefined>();
   const [newTime, setNewTime] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
@@ -87,15 +89,19 @@ export default function ManageAvailability() {
         <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="flex flex-col items-center">
             <h3 className="font-semibold mb-2">1. Select a Date</h3>
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              month={month}
-              onMonthChange={setMonth}
-              className="rounded-md border"
-              disabled={(d) => !!minDate && d < minDate}
-            />
+            {isMounted ? (
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                month={month}
+                onMonthChange={setMonth}
+                className="rounded-md border"
+                disabled={(d) => !!minDate && d < minDate}
+              />
+            ) : (
+              <Skeleton className="w-[280px] h-[330px] rounded-md" />
+            )}
           </div>
           <div>
             <h3 className="font-semibold mb-2">2. Add & View Time Slots</h3>
@@ -111,7 +117,7 @@ export default function ManageAvailability() {
 
               <div className="space-y-2">
                 <Label>Available Slots for {date ? date.toLocaleDateString() : '...'}</Label>
-                {areSlotsLoading ? (
+                {areSlotsLoading || !isMounted ? (
                     <div className="space-y-2">
                         <Skeleton className="h-10 w-full" />
                         <Skeleton className="h-10 w-full" />

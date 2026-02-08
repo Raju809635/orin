@@ -31,8 +31,10 @@ export default function MentorProfilePage() {
   const [minDate, setMinDate] = React.useState<Date | undefined>();
   const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<WithId<TimeSlot> | null>(null);
   const [isBooking, setIsBooking] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
   
   React.useEffect(() => {
+    setIsMounted(true);
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
@@ -138,7 +140,7 @@ export default function MentorProfilePage() {
 
   const isLoading = isMentorLoading || (!!date && areSlotsLoading);
 
-  if (isLoading) {
+  if (isLoading && !isMounted) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
@@ -235,15 +237,19 @@ export default function MentorProfilePage() {
                     <CardDescription>Choose an available date to see time slots.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex justify-center">
-                    <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        month={month}
-                        onMonthChange={setMonth}
-                        className="rounded-md border p-0"
-                        disabled={(date) => !!minDate && date < minDate}
-                    />
+                    {isMounted ? (
+                        <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            month={month}
+                            onMonthChange={setMonth}
+                            className="rounded-md border p-0"
+                            disabled={(date) => !!minDate && date < minDate}
+                        />
+                    ) : (
+                        <Skeleton className="w-[280px] h-[288px] rounded-md" />
+                    )}
                 </CardContent>
              </Card>
              <Card className="mt-8">
@@ -252,7 +258,7 @@ export default function MentorProfilePage() {
                     <CardDescription>All times are in your local timezone.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {areSlotsLoading ? <Skeleton className="h-20 w-full" /> : (
+                    {areSlotsLoading || !isMounted ? <Skeleton className="h-20 w-full" /> : (
                       timeSlots && timeSlots.length > 0 ? (
                         <div className="grid grid-cols-3 gap-2">
                             {timeSlots.map(slot => (
