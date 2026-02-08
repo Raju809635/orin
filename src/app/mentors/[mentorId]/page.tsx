@@ -1,30 +1,99 @@
+
 "use client";
 
 import React from "react";
-import { useParams, notFound } from "next/navigation";
+import { useParams, notFound, useRouter } from "next/navigation";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Clock, Calendar as CalendarIcon } from "lucide-react";
+import { Star, Clock, Calendar as CalendarIcon, AlertCircle } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
-import { doc } from "firebase/firestore";
+import { useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
+import { doc, addDoc, collection } from "firebase/firestore";
 import type { User } from "@/models/user";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function MentorProfilePage() {
   const params = useParams<{ mentorId: string }>();
   const firestore = useFirestore();
+  const router = useRouter();
+  const { user: currentUser } = useUser();
+  const { toast } = useToast();
+
   const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
+  const [isBooking, setIsBooking] = React.useState(false);
   
   const mentorDocRef = useMemoFirebase(
     () => (firestore && params.mentorId ? doc(firestore, "users", params.mentorId) : null),
     [firestore, params.mentorId]
   );
   const { data: mentor, isLoading } = useDoc<User>(mentorDocRef);
+
+  // Hardcoded availability for this example. In a full app, this would be fetched from the mentor's profile.
+  const timeSlots = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM", "04:00 PM"];
+  
+  // Placeholder data for fields not yet in mentor profile
+  const expertise = ['New Mentor'];
+  const rating = 5.0;
+  const reviews = 0;
+  const price = 25;
+  const role = "Expert Mentor";
+  const company = "Orin Platform";
+
+  const handleBooking = async () => {
+    if (!currentUser) {
+      router.push(`/signin?redirect=/mentors/${params.mentorId}`);
+      return;
+    }
+    if (!date || !selectedTime || !mentor) {
+        toast({
+            title: "Booking Incomplete",
+            description: "Please select a date and time to book a session.",
+            variant: "destructive",
+        });
+      return;
+    }
+    setIsBooking(true);
+
+    try {
+        const bookingsCollection = collection(firestore, 'bookings');
+        await addDoc(bookingsCollection, {
+            studentId: currentUser.id,
+            studentName: currentUser.displayName,
+            mentorId: mentor.id,
+            mentorName: mentor.displayName,
+            subject: expertise.join(', '),
+            date: date.toISOString().split('T')[0], // Store date as YYYY-MM-DD
+            time: selectedTime,
+            price: price,
+            status: 'confirmed',
+            createdAt: new Date().toISOString(),
+        });
+
+        toast({
+            title: "Session Booked!",
+            description: `Your session with ${mentor.displayName} on ${date.toLocaleDateString()} at ${selectedTime} is confirmed.`,
+        });
+
+        router.push('/dashboard');
+
+    } catch (error) {
+        console.error("Error booking session:", error);
+        toast({
+            title: "Booking Failed",
+            description: "There was an error booking your session. Please try again.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsBooking(false);
+    }
+  };
 
 
   if (isLoading) {
@@ -67,15 +136,6 @@ export default function MentorProfilePage() {
     notFound();
   }
 
-  const timeSlots = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM", "04:00 PM"];
-
-  // Placeholder data for fields not yet in mentor profile
-  const expertise = ['New Mentor'];
-  const rating = 5.0;
-  const reviews = 0;
-  const price = 25;
-  const role = "Expert Mentor";
-  const company = "Orin Platform";
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -150,10 +210,31 @@ export default function MentorProfilePage() {
                 <CardContent>
                     <div className="grid grid-cols-3 gap-2">
                         {timeSlots.map(time => (
-                            <Button key={time} variant="outline">{time}</Button>
+                            <Button 
+                                key={time} 
+                                variant={selectedTime === time ? "default" : "outline"}
+                                onClick={() => setSelectedTime(time)}
+                            >
+                                {time}
+                            </Button>
                         ))}
                     </div>
-                    <Button className="w-full mt-6 h-12">Book Session for ${price}</Button>
+                     {!currentUser && (
+                         <Alert className="mt-6">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>Sign in to book</AlertTitle>
+                            <AlertDescription>
+                                You need to be signed in to book a session with a mentor.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                    <Button 
+                        className="w-full mt-6 h-12" 
+                        onClick={handleBooking}
+                        disabled={isBooking || !selectedTime}
+                    >
+                        {isBooking ? 'Booking...' : `Book Session for $${price}`}
+                    </Button>
                 </CardContent>
              </Card>
           </div>
@@ -163,3 +244,4 @@ export default function MentorProfilePage() {
     </div>
   );
 }
+

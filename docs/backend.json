@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -295,15 +296,17 @@
         "date": {
           "type": "string",
           "description": "Date of the time slot.",
-          "format": "date-time"
+          "format": "date"
         },
         "startTime": {
           "type": "string",
-          "description": "Start time of the time slot."
+          "description": "Start time of the time slot.",
+          "format": "time"
         },
         "endTime": {
           "type": "string",
-          "description": "End time of the time slot."
+          "description": "End time of the time slot.",
+          "format": "time"
         },
         "bookingStatus": {
           "type": "string",
@@ -323,7 +326,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Booking",
       "type": "object",
-      "description": "Represents a booking made by a student for a mentor's time slot.",
+      "description": "Represents a booking made by a student for a mentor's session. Contains denormalized data for efficient querying.",
       "properties": {
         "id": {
           "type": "string",
@@ -331,15 +334,32 @@
         },
         "studentId": {
           "type": "string",
-          "description": "Reference to User (student). (Relationship: User 1:N Booking)"
+          "description": "Reference to User (student)."
+        },
+        "studentName": {
+            "type": "string",
+            "description": "Denormalized display name of the student."
         },
         "mentorId": {
           "type": "string",
-          "description": "Reference to User (mentor). (Relationship: User 1:N Booking)"
+          "description": "Reference to User (mentor)."
         },
-        "timeSlotId": {
+        "mentorName": {
+            "type": "string",
+            "description": "Denormalized display name of the mentor."
+        },
+        "date": {
           "type": "string",
-          "description": "Reference to TimeSlot. (Relationship: TimeSlot 1:N Booking)"
+          "description": "The date of the session.",
+          "format": "date"
+        },
+        "time": {
+          "type": "string",
+          "description": "The time of the session."
+        },
+        "subject": {
+            "type": "string",
+            "description": "The subject of the session."
         },
         "status": {
           "type": "string",
@@ -349,19 +369,24 @@
           "type": "number",
           "description": "Price of the booking."
         },
-        "paymentDetails": {
-          "type": "string",
-          "description": "Payment details for the booking."
+        "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the booking was created.",
+            "format": "date-time"
         }
       },
       "required": [
         "id",
         "studentId",
+        "studentName",
         "mentorId",
-        "timeSlotId",
+        "mentorName",
+        "date",
+        "time",
+        "subject",
         "status",
         "price",
-        "paymentDetails"
+        "createdAt"
       ]
     },
     "Review": {
@@ -742,3 +767,4 @@
     }
   }
 }
+
