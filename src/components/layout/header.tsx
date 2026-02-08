@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, GraduationCap, LayoutDashboard, User as UserIcon, LogOut } from "lucide-react";
 import { useAuth, useUser } from "@/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
@@ -138,12 +138,16 @@ const Header = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
-              <Link href="/home" className="flex items-center space-x-2 mb-6" onClick={() => setIsOpen(false)}>
-                  <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
-                      <GraduationCap className="h-5 w-5 text-primary-foreground" />
-                  </div>
-                  <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
-              </Link>
+              <SheetHeader className="mb-6">
+                <SheetTitle>
+                   <Link href="/home" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
+                      <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
+                          <GraduationCap className="h-5 w-5 text-primary-foreground" />
+                      </div>
+                      <span className="font-bold font-headline text-2xl tracking-tighter">ORIN</span>
+                  </Link>
+                </SheetTitle>
+              </SheetHeader>
               <div className="flex flex-col space-y-4">
                 {navLinks.map((link) => (
                   <Link
