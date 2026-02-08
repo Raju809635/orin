@@ -30,7 +30,7 @@ export default function DashboardPage() {
           </div>
           <RecommendedMentors />
           <Separator />
-          <MySessions />
+          <MySessions role="student" />
         </div>
       </main>
       <Footer />

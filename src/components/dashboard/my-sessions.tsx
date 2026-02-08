@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useMemo } from "react";
@@ -7,24 +6,33 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
-import { collection, query, where, orderBy } from "firebase/firestore";
+import { collection, query, where, orderBy, Query } from "firebase/firestore";
 import { Skeleton } from "../ui/skeleton";
 import type { Booking } from "@/models/booking";
 
-export default function MySessions() {
+type MySessionsProps = {
+  role?: 'student' | 'mentor';
+}
+
+export default function MySessions({ role = 'student' }: MySessionsProps) {
   const { toast } = useToast();
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 
-  const studentBookingsQuery = useMemoFirebase(
-    () => user && firestore ? query(
-      collection(firestore, 'bookings'),
-      where('studentId', '==', user.id),
-      orderBy('createdAt', 'desc')
-    ) : null,
-    [user, firestore]
+  const bookingsQuery = useMemoFirebase(
+    () => {
+      if (!user || !firestore) return null;
+      const queryField = role === 'mentor' ? 'mentorId' : 'studentId';
+      return query(
+        collection(firestore, 'bookings'),
+        where(queryField, '==', user.id),
+        orderBy('createdAt', 'desc')
+      );
+    },
+    [user, firestore, role]
   );
-  const { data: bookings, isLoading: areBookingsLoading } = useCollection<Booking>(studentBookingsQuery);
+  
+  const { data: bookings, isLoading: areBookingsLoading } = useCollection<Booking>(bookingsQuery);
 
   const { upcomingSessions, pastSessions } = useMemo(() => {
     if (!bookings) {
@@ -62,6 +70,8 @@ export default function MySessions() {
   };
 
   const isLoading = isUserLoading || areBookingsLoading;
+  const withName = role === 'student' ? 'mentorName' : 'studentName';
+  const withLabel = role === 'student' ? 'with' : 'with';
 
   return (
     <div className="space-y-8">
@@ -79,7 +89,7 @@ export default function MySessions() {
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">{session.subject}</h3>
-                    <p className="text-sm text-muted-foreground">with {session.mentorName}</p>
+                    <p className="text-sm text-muted-foreground">{withLabel} {session[withName]}</p>
                     <p className="text-sm text-muted-foreground">{new Date(session.date).toLocaleDateString()} at {session.time}</p>
                   </div>
                   <Button onClick={handleJoinSession}>Join Session</Button>
@@ -104,7 +114,7 @@ export default function MySessions() {
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">{session.subject}</h3>
-                    <p className="text-sm text-muted-foreground">with {session.mentorName}</p>
+                    <p className="text-sm text-muted-foreground">{withLabel} {session[withName]}</p>
                     <p className="text-sm text-muted-foreground">{new Date(session.date).toLocaleDateString()}</p>
                   </div>
                   <Badge variant="secondary">{session.status === 'confirmed' ? 'Completed' : session.status}</Badge>
