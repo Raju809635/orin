@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, GraduationCap, LayoutDashboard, User as UserIcon, LogOut, Settings, Moon, Sun } from "lucide-react";
+import { Menu, GraduationCap, LayoutDashboard, User as UserIcon, LogOut, Settings, Moon, Sun, Briefcase } from "lucide-react";
 import { useAuth, useUser } from "@/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
 import {
@@ -30,6 +30,7 @@ const Header = () => {
   const { theme, setTheme } = useTheme();
 
   const handleSignOut = async () => {
+    if (!auth) return;
     await firebaseSignOut(auth);
     router.push('/');
   };
@@ -98,6 +99,23 @@ const Header = () => {
                         </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
+                        {user.role === 'mentor' && (
+                            <>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/dashboard">
+                                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                                        <span>Student Dashboard</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/mentor-dashboard">
+                                        <Briefcase className="mr-2 h-4 w-4" />
+                                        <span>Mentor Dashboard</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                            </>
+                        )}
                         <DropdownMenuItem asChild>
                            <Link href={getProfileHref()}>
                             <UserIcon className="mr-2 h-4 w-4" />
@@ -169,7 +187,14 @@ const Header = () => {
                 <Separator className="my-2"/>
                  {user ? (
                    <div className="flex flex-col space-y-4">
-                      <Link href={getDashboardHref()} onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Dashboard</Link>
+                      {user.role === 'mentor' ? (
+                        <>
+                          <Link href="/dashboard" onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Student Dashboard</Link>
+                          <Link href="/mentor-dashboard" onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Mentor Dashboard</Link>
+                        </>
+                      ) : (
+                        <Link href={getDashboardHref()} onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Dashboard</Link>
+                      )}
                       <Link href={getProfileHref()} onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Profile</Link>
                       <button onClick={() => { handleSignOut(); setIsOpen(false); }} className="text-left text-base font-medium transition-colors hover:text-primary text-foreground/80">Sign Out</button>
                    </div>
