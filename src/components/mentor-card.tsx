@@ -7,16 +7,16 @@ import { Button } from './ui/button';
 import Link from 'next/link';
 
 type MentorCardProps = {
-  id: number;
+  id: string;
   name: string;
-  role: string;
-  company: string;
+  role?: string;
+  company?: string;
   imageUrl: string;
   imageHint: string;
   expertise: string[];
-  rating: number;
-  reviews: number;
-  price: number;
+  rating?: number;
+  reviews?: number;
+  price?: number;
 };
 
 const MentorCard = ({ id, name, role, company, imageUrl, imageHint, expertise, rating, reviews, price }: MentorCardProps) => {
@@ -37,7 +37,7 @@ const MentorCard = ({ id, name, role, company, imageUrl, imageHint, expertise, r
         </div>
         <div className="p-4 flex flex-col flex-grow">
           <h3 className="font-headline font-semibold text-lg">{name}</h3>
-          <p className="text-sm text-muted-foreground truncate">{role} @ {company}</p>
+          {role && company && <p className="text-sm text-muted-foreground truncate">{role} @ {company}</p>}
 
           <div className="flex flex-wrap gap-1 my-2">
             {expertise.slice(0, 2).map((skill) => (
@@ -45,16 +45,20 @@ const MentorCard = ({ id, name, role, company, imageUrl, imageHint, expertise, r
             ))}
           </div>
 
-          <div className="flex items-center text-sm text-muted-foreground my-2">
-            <div className="flex items-center">
-              <Star className="w-4 h-4 text-accent fill-accent mr-1" />
-              <span>{rating.toFixed(1)}</span>
-              <span className="ml-1">({reviews} reviews)</span>
+          {(rating !== undefined && reviews !== undefined) && (
+            <div className="flex items-center text-sm text-muted-foreground my-2">
+              <div className="flex items-center">
+                <Star className="w-4 h-4 text-accent fill-accent mr-1" />
+                <span>{rating.toFixed(1)}</span>
+                <span className="ml-1">({reviews} reviews)</span>
+              </div>
             </div>
-          </div>
+          )}
           
           <div className="mt-auto pt-4 flex justify-between items-center">
-            <p className="text-lg font-semibold font-headline">${price}<span className="text-sm font-normal text-muted-foreground">/session</span></p>
+            {price !== undefined ? (
+               <p className="text-lg font-semibold font-headline">${price}<span className="text-sm font-normal text-muted-foreground">/session</span></p>
+            ) : <div />}
             <Button asChild>
               <Link href={`/mentors/${id}`}>Book Now</Link>
             </Button>

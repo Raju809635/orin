@@ -1,7 +1,8 @@
+"use client";
+
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import MentorCard from "@/components/mentor-card";
-import { mentors } from "@/lib/mentors-data";
 import {
   Sidebar,
   SidebarContent,
@@ -22,8 +23,20 @@ import {
 } from "@/components/ui/accordion";
 import { Search } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
+import type { User } from "@/models/user";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function MentorsPage() {
+  const firestore = useFirestore();
+  const mentorsQuery = useMemoFirebase(
+    () => (firestore ? query(collection(firestore, 'users'), where('role', '==', 'mentor')) : null),
+    [firestore]
+  );
+  const { data: mentors, isLoading } = useCollection<User>(mentorsQuery);
+
   return (
     <SidebarProvider>
       <div className="flex flex-col min-h-screen bg-background">
@@ -128,23 +141,39 @@ export default function MentorsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {mentors.map((mentor) => (
-                    <MentorCard
-                      key={mentor.id}
-                      id={mentor.id}
-                      name={mentor.name}
-                      role={mentor.role}
-                      company={mentor.company}
-                      imageUrl={mentor.imageUrl}
-                      imageHint={mentor.imageHint}
-                      expertise={mentor.expertise}
-                      rating={mentor.rating}
-                      reviews={mentor.reviews}
-                      price={mentor.price}
-                    />
-                  ))}
-                </div>
+                {isLoading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {[...Array(8)].map((_, i) => (
+                      <Card key={i}>
+                        <Skeleton className="w-full h-48" />
+                        <CardContent className="p-4 space-y-2">
+                          <Skeleton className="h-6 w-3/4" />
+                          <Skeleton className="h-4 w-1/2" />
+                          <Skeleton className="h-4 w-full" />
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {mentors?.map((mentor) => (
+                      <MentorCard
+                        key={mentor.id}
+                        id={mentor.id}
+                        name={mentor.displayName || 'Unnamed Mentor'}
+                        // Provide default values for now
+                        role="Expert Mentor"
+                        company="Orin Platform"
+                        imageUrl={mentor.photoURL || 'https://picsum.photos/seed/default-avatar/300/300'}
+                        imageHint="professional portrait"
+                        expertise={['New Mentor']}
+                        rating={5}
+                        reviews={0}
+                        price={25}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </main>
             <Footer />
