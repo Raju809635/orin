@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,18 @@ export default function ManageAvailability() {
   const firestore = useFirestore();
   const { toast } = useToast();
 
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>();
+  const [minDate, setMinDate] = useState<Date | undefined>();
   const [newTime, setNewTime] = useState('');
+
+  useEffect(() => {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    
+    setDate(today);
+    setMinDate(yesterday);
+  }, []);
 
   const timeSlotsQuery = useMemoFirebase(() => {
     if (!firestore || !user || !date) return null;
@@ -79,7 +89,7 @@ export default function ManageAvailability() {
               selected={date}
               onSelect={setDate}
               className="rounded-md border"
-              disabled={(d) => d < new Date(new Date().setDate(new Date().getDate() - 1))}
+              disabled={(d) => !!minDate && d < minDate}
             />
           </div>
           <div>

@@ -26,10 +26,20 @@ export default function MentorProfilePage() {
   const { user: currentUser } = useUser();
   const { toast } = useToast();
 
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [date, setDate] = React.useState<Date | undefined>();
+  const [minDate, setMinDate] = React.useState<Date | undefined>();
   const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<WithId<TimeSlot> | null>(null);
   const [isBooking, setIsBooking] = React.useState(false);
   
+  React.useEffect(() => {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    
+    setDate(today);
+    setMinDate(yesterday);
+  }, []);
+
   const mentorDocRef = useMemoFirebase(
     () => (firestore && params.mentorId ? doc(firestore, "users", params.mentorId) : null),
     [firestore, params.mentorId]
@@ -228,7 +238,7 @@ export default function MentorProfilePage() {
                         selected={date}
                         onSelect={setDate}
                         className="rounded-md border p-0"
-                        disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() - 1))}
+                        disabled={(date) => !!minDate && date < minDate}
                     />
                 </CardContent>
              </Card>
