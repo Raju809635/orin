@@ -12,10 +12,12 @@ import React from "react";
 import { useUser, useFirestore, FirestorePermissionError, errorEmitter } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { doc, setDoc } from "firebase/firestore";
+import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BecomeAMentorPage() {
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser(); // Get user and loading state
   const firestore = useFirestore();
   const router = useRouter();
 
@@ -60,6 +62,57 @@ export default function BecomeAMentorPage() {
       });
   };
 
+  // Loading state
+  if (isUserLoading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <Header />
+        <main className="flex-grow container py-12 md:py-20">
+          <div className="max-w-3xl mx-auto">
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-10 w-3/4 mx-auto" />
+                <Skeleton className="h-5 w-1/2 mx-auto mt-2" />
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-12 w-full" />
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // If user is already a mentor
+  if (user && user.role === 'mentor') {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <Header />
+        <main className="flex-grow container flex items-center justify-center py-12 md:py-20">
+          <div className="max-w-3xl mx-auto w-full">
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle className="text-3xl md:text-4xl font-headline">You're Already a Mentor</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center space-y-4">
+                <p className="text-muted-foreground">You have already registered as a mentor.</p>
+                <Button asChild className="h-12">
+                  <Link href="/mentor-dashboard">Go to Mentor Dashboard</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Default: Show application form for non-mentors
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
