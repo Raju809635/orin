@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
+import { useParams, notFound } from "next/navigation";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { mentors } from "@/lib/mentors-data";
-import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Star, Clock, Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 
-export default function MentorProfilePage({ params }: { params: { mentorId: string } }) {
+export default function MentorProfilePage() {
+  const params = useParams<{ mentorId: string }>();
   const mentor = mentors.find(m => m.id.toString() === params.mentorId);
   const [date, setDate] = React.useState<Date | undefined>(new Date());
 
