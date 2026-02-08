@@ -9,16 +9,54 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
+import { useUser, useFirestore, FirestorePermissionError, errorEmitter } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function BecomeAMentorPage() {
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Application Submitted",
-      description: "Thank you! We will review your application and get back to you soon.",
-    });
+
+    if (!user || !firestore) {
+      toast({
+        title: "You must be signed in",
+        description: "Please sign in to apply to be a mentor.",
+        variant: "destructive",
+      });
+      router.push('/signin');
+      return;
+    }
+
+    const userDocRef = doc(firestore, 'users', user.id);
+    
+    // In a real app, this would trigger a backend review process.
+    // Here, we'll just update the user's role directly to simulate approval.
+    setDoc(userDocRef, { role: 'mentor' }, { merge: true })
+      .then(() => {
+        toast({
+          title: "Application Submitted!",
+          description: "You are now a mentor! Please sign in again to access your mentor dashboard.",
+        });
+        router.push('/signin');
+      })
+      .catch((serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: userDocRef.path,
+          operation: 'update',
+          requestResourceData: { role: 'mentor' },
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({
+            title: "Submission Failed",
+            description: "There was an error submitting your application. Please try again.",
+            variant: "destructive"
+        })
+      });
   };
 
   return (
@@ -29,7 +67,7 @@ export default function BecomeAMentorPage() {
           <Card>
             <CardHeader className="text-center">
               <CardTitle className="text-3xl md:text-4xl font-headline">Become a Mentor</CardTitle>
-              <CardDescription>Join our community and start sharing your expertise with students.</CardDescription>
+              <CardDescription>Join our community and start sharing your expertise.</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-6" onSubmit={handleSubmit}>

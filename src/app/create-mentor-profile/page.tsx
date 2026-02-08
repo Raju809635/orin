@@ -1,3 +1,4 @@
+"use client";
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -5,9 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useUser } from "@/firebase";
 import Link from "next/link";
 
 export default function CreateMentorProfilePage() {
+  const { user } = useUser();
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -23,11 +27,11 @@ export default function CreateMentorProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Full Name</Label>
-                    <Input id="fullName" placeholder="Enter your full name" />
+                    <Input id="fullName" placeholder="Enter your full name" defaultValue={user?.displayName || ''} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" placeholder="your-email@example.com" disabled value="your-email@example.com" />
+                    <Input id="email" type="email" placeholder="your-email@example.com" disabled defaultValue={user?.email || ''} />
                   </div>
                 </div>
                 <div className="space-y-2">

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 
-export default function CreateStudentProfilePage() {
+export default function CreateProfilePage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -15,8 +15,8 @@ export default function CreateStudentProfilePage() {
         <div className="max-w-3xl mx-auto">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl md:text-4xl font-headline">Create Your Student Profile</CardTitle>
-              <CardDescription>Tell us a bit about yourself to get the best mentor recommendations.</CardDescription>
+              <CardTitle className="text-3xl md:text-4xl font-headline">Create Your Profile</CardTitle>
+              <CardDescription>Tell us a bit about yourself to get started.</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-6">
@@ -29,8 +29,8 @@ export default function CreateStudentProfilePage() {
                   <Input id="classLevel" placeholder="e.g., 12th Grade, B.Tech 2nd Year" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="academicGoals">Academic Goals</Label>
-                  <Textarea id="academicGoals" placeholder="What are you hoping to achieve? e.g., Prepare for JEE, learn React..." />
+                  <Label htmlFor="academicGoals">Your Goals</Label>
+                  <Textarea id="academicGoals" placeholder="What are you hoping to achieve? e.g., Prepare for an exam, learn a new skill..." />
                 </div>
                 <Link href="/dashboard" className="block">
                     <Button className="w-full h-12">Complete Profile & Go to Dashboard</Button>

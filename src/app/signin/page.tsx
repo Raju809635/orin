@@ -43,9 +43,11 @@ export default function SignInPage() {
           router.push('/dashboard');
         }
       } else {
+        // This case can happen if a user authenticates but their user document write fails.
+        // We direct them back to sign-up to ensure a user document is created.
         toast({
-          title: "Account not found",
-          description: "Please sign up first to select a role.",
+          title: "Profile not found",
+          description: "Please complete your profile to continue.",
           variant: "destructive",
         });
         router.push('/');
@@ -108,7 +110,7 @@ export default function SignInPage() {
             <CardContent className="space-y-4">
               <Button className="w-full h-12" onClick={() => router.push('/dashboard')}>
                  <LayoutDashboard className="mr-2" />
-                 Go to Student Dashboard
+                 Go to Your Dashboard
               </Button>
                <Button variant="outline" className="w-full h-12" onClick={() => router.push('/mentor-dashboard')}>
                 <UserIcon className="mr-2" />
