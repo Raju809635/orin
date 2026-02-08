@@ -26,13 +26,19 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/signin');
+    }
+  }, [user, isUserLoading, router]);
+
+  useEffect(() => {
     if (user) {
       setDisplayName(user.displayName || '');
       setPhotoURL(user.photoURL || '');
     }
   }, [user]);
 
-  if (isUserLoading) {
+  if (isUserLoading || !user) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
@@ -67,13 +73,6 @@ export default function ProfilePage() {
         <Footer />
       </div>
     );
-  }
-
-  if (!user) {
-    // This should ideally not happen if the page is protected,
-    // but as a fallback, we can redirect.
-    router.push('/signin');
-    return null;
   }
   
   const getInitials = (name?: string | null) => {
