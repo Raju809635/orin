@@ -5,23 +5,32 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useCollection, useFirestore, useMemoFirebase, useUser } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
+import { Booking } from "@/models/booking";
+import { Skeleton } from "../ui/skeleton";
 
 type MySessionsProps = {
   role?: 'student' | 'mentor';
 }
 
-// Static data to prevent app crash
-const upcomingSessions = [
-  { id: '1', subject: 'Calculus II', withName: 'Dr. Evelyn Reed', date: 'July 30, 2024', time: '11:00 AM', status: 'confirmed' },
-];
-
-const pastSessions = [
-    { id: 'p1', subject: 'Intro to Python', withName: 'John Smith', date: 'July 15, 2024', time: '02:00 PM', status: 'completed' },
-    { id: 'p2', subject: 'Data Structures', withName: 'Jane Doe', date: 'July 10, 2024', time: '10:00 AM', status: 'completed' },
-];
+type WithId<T> = T & { id: string };
 
 export default function MySessions({ role = 'student' }: MySessionsProps) {
   const { toast } = useToast();
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
+
+  const filterField = role === 'student' ? 'studentId' : 'mentorId';
+
+  const sessionsQuery = useMemoFirebase(
+    () => (firestore && user ? query(collection(firestore, "bookings"), where(filterField, "==", user.id)) : null),
+    [firestore, user, filterField]
+  );
+  const { data: sessions, isLoading: areSessionsLoading } = useCollection<Booking>(sessionsQuery);
+
+  const upcomingSessions = sessions?.filter(s => new Date(s.date) >= new Date()) || [];
+  const pastSessions = sessions?.filter(s => new Date(s.date) < new Date()) || [];
 
   const handleJoinSession = () => {
     toast({
@@ -30,26 +39,28 @@ export default function MySessions({ role = 'student' }: MySessionsProps) {
     });
   };
 
-  const withLabel = role === 'student' ? 'with' : 'with';
+  const withLabel = role === 'student' ? 'with Mentor' : 'with Student';
   const nameKey = role === 'student' ? 'mentorName' : 'studentName';
-  
-  // Create a version of the data with the correct name property for the role
-  const staticUpcoming = upcomingSessions.map(s => ({...s, [nameKey]: s.withName}));
-  const staticPast = pastSessions.map(s => ({...s, [nameKey]: s.withName}));
+
+  const isLoading = isUserLoading || areSessionsLoading;
 
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-bold font-headline mb-4">Upcoming Sessions</h2>
-        {staticUpcoming.length > 0 ? (
+        {isLoading ? (
           <div className="grid gap-6">
-            {staticUpcoming.map(session => (
+            <Skeleton className="h-24 w-full" />
+          </div>
+        ) : upcomingSessions.length > 0 ? (
+          <div className="grid gap-6">
+            {upcomingSessions.map(session => (
               <Card key={session.id}>
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">{session.subject}</h3>
-                    <p className="text-sm text-muted-foreground">{withLabel} {session[nameKey]}</p>
-                    <p className="text-sm text-muted-foreground">{session.date} at {session.time}</p>
+                    <p className="text-sm text-muted-foreground">{withLabel}: {session[nameKey]}</p>
+                    <p className="text-sm text-muted-foreground">{new Date(session.date).toLocaleDateString()} at {session.time}</p>
                   </div>
                   <Button onClick={handleJoinSession}>Join Session</Button>
                 </CardContent>
@@ -62,15 +73,20 @@ export default function MySessions({ role = 'student' }: MySessionsProps) {
       </div>
       <div>
         <h2 className="text-2xl font-bold font-headline mb-4">Past Sessions</h2>
-         {staticPast.length > 0 ? (
+         {isLoading ? (
+           <div className="grid gap-6">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+           </div>
+         ) : pastSessions.length > 0 ? (
           <div className="grid gap-6">
-            {staticPast.map(session => (
+            {pastSessions.map(session => (
               <Card key={session.id}>
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">{session.subject}</h3>
-                    <p className="text-sm text-muted-foreground">{withLabel} {session[nameKey]}</p>
-                    <p className="text-sm text-muted-foreground">{session.date}</p>
+                    <p className="text-sm text-muted-foreground">{withLabel}: {session[nameKey]}</p>
+                    <p className="text-sm text-muted-foreground">{new Date(session.date).toLocaleDateString()}</p>
                   </div>
                   <Badge variant="secondary">{session.status}</Badge>
                 </CardContent>

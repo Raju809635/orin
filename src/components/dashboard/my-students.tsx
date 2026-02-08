@@ -3,16 +3,32 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from '../ui/skeleton';
-
-// Static data to prevent app crash due to persistent Firestore security rule issue.
-const staticStudents = [
-    { id: 'student1', name: 'Alice Johnson' },
-    { id: 'student2', name: 'Bob Williams' },
-];
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
+import { collection, query, where } from 'firebase/firestore';
+import { Booking } from '@/models/booking';
 
 export default function MyStudents() {
-    const students = staticStudents;
-    const isLoading = false; // Set to false as we are using static data
+    const { user, isUserLoading } = useUser();
+    const firestore = useFirestore();
+
+    const bookingsQuery = useMemoFirebase(
+        () => (firestore && user ? query(collection(firestore, "bookings"), where("mentorId", "==", user.id)) : null),
+        [firestore, user]
+    );
+    const { data: bookings, isLoading: areBookingsLoading } = useCollection<Booking>(bookingsQuery);
+
+    const students = React.useMemo(() => {
+        if (!bookings) return [];
+        const studentMap = new Map<string, { id: string; name: string }>();
+        bookings.forEach(booking => {
+            if (!studentMap.has(booking.studentId)) {
+                studentMap.set(booking.studentId, { id: booking.studentId, name: booking.studentName });
+            }
+        });
+        return Array.from(studentMap.values());
+    }, [bookings]);
+
+    const isLoading = isUserLoading || areBookingsLoading;
 
     return (
         <div>
@@ -23,7 +39,7 @@ export default function MyStudents() {
                     <Skeleton className="h-24 w-full" />
                 </div>
             ) : students.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {students.map(student => (
                         <Card key={student.id}>
                             <CardContent className="p-6">

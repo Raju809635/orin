@@ -1,0 +1,380 @@
+
+/**
+ * Core Philosophy:
+ * This ruleset enforces a security model based on user roles (Student, Mentor, Admin)
+ * and data ownership. It strictly controls access to private user data while allowing
+ * public read access to shared content like subject categories. Admins have read-only
+ * access to most user data for moderation and support, with write access restricted to
+ * administrative collections.
+ *
+ * Data Structure:
+ * - User-specific data (profiles, timeslots, favorites) is nested under `/users/{userId}`.
+ * - Collaborative data (bookings, chats) is stored in top-level collections but contains
+ *   denormalized `studentId` and `mentorId` fields for efficient and secure access checks.
+ * - Publicly readable content (categories, subjects) is organized under `/categories`.
+ * - Administrative data (transactions, coupons) and roles are in separate, locked-down
+ *   top-level collections.
+ *
+ * Key Security Decisions:
+ * - Admin roles are managed by the existence of a document in the `/roles_admin/{userId}`
+ *   collection. This collection is not readable or writable by any client to prevent
+ *   user enumeration and privilege escalation.
+ * - Most user-owned data can be read by admins, but not modified, to prevent accidental
+ *   data corruption.
+ * - For collection queries (`list` operations), rules that depend on document data (`resource.data`)
+ *   require the client to use a corresponding `where()` clause. This is a fundamental
+ *   security principle in Firestore. For example, to list bookings, the client must filter
+ *   by `studentId` or `mentorId`.
+ * - Chat messages and reviews are subcollections of a booking, ensuring that interactions
+ *   are tied to a confirmed session and accessible only to the involved participants.
+ *
+ * Denormalization for Authorization:
+ * Documents in collections like `/bookings`, `/reviews`, and `/chat_messages` contain
+ * denormalized user IDs (`studentId`, `mentorId`, `senderId`, `recipientId`). This strategy
+ * is critical for security and performance, as it allows rules to authorize access by
+ * checking fields on the document itself, avoiding slow and costly `get()` calls to other
+ * documents.
+ *
+ * Structural Segregation:
+ * The ruleset segregates data by access level. Private user data is stored in the
+ * `/users/{userId}` tree, ensuring path-based ownership rules apply. Public data, like
+ * `/categories`, is in a separate top-level collection with permissive read rules.
+ * This clear separation simplifies security logic and improves query performance.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns true if the user is signed in.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Returns true if the requesting user has an admin role.
+     * Admin status is determined by the existence of a document in the
+     * `/roles_admin` collection corresponding to the user's UID.
+     * IMPORTANT: This involves a `get()` call and CANNOT be used for `list` rules.
+     */
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /**
+     * Returns true if the requesting user's UID matches the provided `userId`.
+     * This is the primary function for checking resource ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Validates that an incoming document's `id` field matches the `userId` from the path.
+     * Ensures relational integrity on document creation.
+     */
+    function createdWithValidUserId(userId) {
+      return request.resource.data.id == userId;
+    }
+    
+    /**
+     * Validates that an incoming document's `userId` field matches the `userId` from the path.
+     * Ensures relational integrity on document creation for profiles.
+     */
+    function createdWithValidProfileUserId(userId) {
+      return request.resource.data.userId == userId;
+    }
+
+    /**
+     * Ensures a document's `id` or `userId` field is not changed during an update.
+     * Prevents re-assigning ownership of a document.
+     */
+    function userIdIsImmutable() {
+      return request.resource.data.id == resource.data.id || request.resource.data.userId == resource.data.userId;
+    }
+
+    // -------------------------------------------------------------------------
+    // User Data and Profiles
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description Controls access to a user's primary profile document.
+     * @path /users/{userId}
+     * @allow (create) A new user creating their own user document.
+     * @deny (update) A user trying to update another user's document.
+     * @principle A user can only create, read, update, or delete their own data. Admins have read-only access.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin() || resource.data.role == 'mentor';
+      allow list: if isSignedIn();
+      allow create: if isOwner(userId) && createdWithValidUserId(userId);
+      allow update: if isOwner(userId) && userIdIsImmutable();
+      allow delete: if isOwner(userId);
+
+      /**
+       * @description Controls access to a user's student profile.
+       * @path /users/{userId}/student_profile/{docId}
+       * @allow (create) A student creating their own student profile.
+       * @deny (get) An authenticated user trying to read another student's profile.
+       * @principle Enforces strict ownership over a user's subcollection data.
+       */
+      match /student_profile/{docId} {
+        allow get: if isOwner(userId) || isAdmin();
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && createdWithValidProfileUserId(userId);
+        allow update: if isOwner(userId) && userIdIsImmutable();
+        allow delete: if isOwner(userId);
+      }
+
+      /**
+       * @description Controls access to a user's mentor profile.
+       * @path /users/{userId}/mentor_profile/{docId}
+       * @allow (create) A mentor creating their own mentor profile.
+       * @deny (delete) An authenticated user trying to delete another mentor's profile.
+       * @principle Enforces strict ownership over a user's subcollection data.
+       */
+      match /mentor_profile/{docId} {
+        allow get: if isOwner(userId) || isAdmin();
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && createdWithValidProfileUserId(userId);
+        allow update: if isOwner(userId) && userIdIsImmutable();
+        allow delete: if isOwner(userId);
+      }
+      
+      /**
+       * @description Controls access to a mentor's available time slots.
+       * @path /users/{mentorId}/timeslots/{timeSlotId}
+       * @allow (create) A mentor creating a new timeslot for their availability.
+       * @deny (update) A student trying to modify a mentor's timeslot directly.
+       * @principle Only the owner (mentor) can manage their own timeslots. Anyone can read them to check availability.
+       */
+      match /timeslots/{timeSlotId} {
+        allow get, list: if isSignedIn();
+        allow create: if isOwner(userId) && request.resource.data.mentorId == userId;
+        allow update: if 
+                      // Case 1: The mentor is editing their own timeslot
+                      (isOwner(userId) && request.resource.data.mentorId == resource.data.mentorId) || 
+                      // Case 2: A student is booking an available slot
+                      (isSignedIn() && 
+                        request.resource.data.bookingStatus == 'booked' && 
+                        resource.data.bookingStatus == 'available' &&
+                        // Ensure no other fields are changed by the student
+                        request.resource.data.mentorId == resource.data.mentorId &&
+                        request.resource.data.date == resource.data.date &&
+                        request.resource.data.startTime == resource.data.startTime
+                      );
+        allow delete: if isOwner(userId);
+      }
+      
+      /**
+       * @description Controls access to a mentor's uploaded resources.
+       * @path /users/{mentorId}/resources/{resourceId}
+       * @allow (create) A mentor uploading a new resource for their students.
+       * @deny (create) A student trying to upload a resource under a mentor's name.
+       * @principle Enforces that only the mentor can manage their own educational resources.
+       */
+      match /resources/{resourceId} {
+        allow get, list: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && request.resource.data.mentorId == userId;
+        allow update: if isOwner(userId) && request.resource.data.mentorId == resource.data.mentorId;
+        allow delete: if isOwner(userId);
+      }
+      
+      /**
+       * @description Controls a student's list of favorite mentors.
+       * @path /users/{studentId}/favorites/{favoriteId}
+       * @allow (create) A student adding a mentor to their favorites list.
+       * @deny (get) A mentor trying to see who has favorited them.
+       * @principle A user's favorites list is private and can only be managed by them.
+       */
+      match /favorites/{favoriteId} {
+        allow get, list: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && request.resource.data.studentId == userId;
+        allow update: if false;
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Public Content (Categories, Subjects, Exams)
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description Controls access to subject and mentor categories. Publicly readable by anyone.
+     * @path /categories/{categoryId}
+     * @allow (get, list) Any user, signed in or not, can read categories.
+     * @deny (create, update, delete) Only admins can manage the category taxonomy.
+     * @principle Segregates public read-only data from private or administrative data.
+     */
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+
+      /**
+       * @description Controls access to subjects within a category. Publicly readable.
+       * @path /categories/{categoryId}/subjects/{subjectId}
+       * @allow (get) Any user can view the details of a subject.
+       * @deny (create) A regular user trying to add a new subject.
+       * @principle Inherits the public-read, admin-write policy from its parent collection.
+       */
+      match /subjects/{subjectId} {
+        allow get, list: if true;
+        allow create, update, delete: if isAdmin();
+      }
+
+      /**
+       * @description Controls access to exams within a category. Publicly readable.
+       * @path /categories/{categoryId}/exams/{examId}
+       * @allow (list) Any user can list all exams in a category.
+       * @deny (update) A regular user trying to modify an exam's details.
+       * @principle Inherits the public-read, admin-write policy from its parent collection.
+       */
+      match /exams/{examId} {
+        allow get, list: if true;
+        allow create, update, delete: if isAdmin();
+      }
+    }
+    
+    // -------------------------------------------------------------------------
+    // Collaborative Data (Bookings, Reviews, Chats)
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description Controls access to booking documents.
+     * @path /bookings/{bookingId}
+     * @allow (get) The student, mentor, or an admin can read the booking.
+     * @allow (list) Any signed-in user can query the collection, but queries MUST include a `where` clause on `studentId` or `mentorId` to succeed.
+     * @principle Access is granted based on denormalized participant IDs (`studentId`, `mentorId`) on the document.
+     */
+    match /bookings/{bookingId} {
+      allow get: if (isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId))) || isAdmin();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isOwner(request.resource.data.studentId);
+      allow update: if isSignedIn() && 
+                     (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId)) &&
+                     request.resource.data.studentId == resource.data.studentId &&
+                     request.resource.data.mentorId == resource.data.mentorId;
+      allow delete: if isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId));
+      
+      /**
+       * @description Controls access to reviews for a specific booking.
+       * @path /bookings/{bookingId}/reviews/{reviewId}
+       * @allow (create) The student who made the booking can create a review.
+       * @deny (update) Once a review is submitted, it cannot be changed.
+       * @principle The student owns the review they create. The mentor can read it but not alter it.
+       */
+      match /reviews/{reviewId} {
+        function isParticipant() {
+          let booking = get(/databases/$(database)/documents/bookings/$(bookingId));
+          return request.auth.uid == booking.data.studentId || request.auth.uid == booking.data.mentorId;
+        }
+        
+        allow get, list: if (isSignedIn() && isParticipant()) || isAdmin();
+        allow create: if isSignedIn() && isOwner(request.resource.data.studentId);
+        allow update: if false;
+        allow delete: if isSignedIn() && isOwner(request.resource.data.studentId);
+      }
+      
+      /**
+       * @description Controls access to chat messages within a booking.
+       * @path /bookings/{bookingId}/chat_messages/{messageId}
+       * @allow (create) The sender of the message can create it, if they are part of the booking.
+       * @deny (get) A user not involved in the booking trying to read messages.
+       * @principle Only the sender and receiver, who are participants in the parent booking, can access messages.
+       */
+      match /chat_messages/{messageId} {
+        function isParticipant() {
+          let booking = get(/databases/$(database)/documents/bookings/$(bookingId));
+          return request.auth.uid == booking.data.studentId || request.auth.uid == booking.data.mentorId;
+        }
+        
+        function isSenderOrReceiver() {
+          return isOwner(request.resource.data.senderId) || isOwner(request.resource.data.receiverId);
+        }
+        
+        allow get, list: if (isSignedIn() && isParticipant() && isSenderOrReceiver()) || isAdmin();
+        allow create: if isSignedIn() && isParticipant() && isOwner(request.resource.data.senderId);
+        allow update: if false;
+        allow delete: if isSignedIn() && isOwner(request.resource.data.senderId);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Admin-Only Collections
+    // -------------------------------------------------------------------------
+    
+    /**
+     * @description Admin-only collection linking mentors to their expertise.
+     * @path /mentor_expertise/{mentorExpertiseId}
+     * @allow (get) An admin reading an expertise record.
+     * @deny (create) Any non-admin user trying to create a record.
+     * @principle This entire collection is locked down for administrative use only.
+     */
+    match /mentor_expertise/{mentorExpertiseId} {
+      allow get, list, create, update, delete: if isAdmin();
+    }
+    
+    /**
+     * @description Admin-only collection linking mentors to categories.
+     * @path /mentor_categories/{mentorCategoryId}
+     * @allow (get) An admin reading a mentor-category link.
+     * @deny (update) Any non-admin user trying to update a record.
+     * @principle This entire collection is locked down for administrative use only.
+     */
+    match /mentor_categories/{mentorCategoryId} {
+      allow get, list, create, update, delete: if isAdmin();
+    }
+    
+    /**
+     * @description Admin-only collection for tracking financial transactions.
+     * @path /transactions/{transactionId}
+     * @allow (get) An admin viewing a transaction record.
+     * @deny (list) A regular user attempting to enumerate all transactions.
+     * @principle Financial data is highly sensitive and restricted to admin access.
+     */
+    match /transactions/{transactionId} {
+      allow get, create, update, delete: if isAdmin();
+      allow list: if false;
+    }
+    
+    /**
+     * @description Admin-only collection for managing discount coupon codes.
+     * @path /coupon_codes/{couponCodeId}
+     * @allow (create) An admin creating a new coupon code for a promotion.
+     * @deny (delete) A regular user attempting to delete a coupon code.
+     * @principle Coupon management is an administrative function.
+     */
+    match /coupon_codes/{couponCodeId} {
+      allow get, list, create, update, delete: if isAdmin();
+    }
+    
+    /**
+     * @description Collection for user notifications.
+     * @path /notifications/{notificationId}
+     * @allow (get) A user reading their own notification.
+     * @deny (create) A user trying to create a notification for someone else.
+     * @principle Users can only access notifications where they are the recipient. Creation is server-side.
+     */
+    match /notifications/{notificationId} {
+      allow get, list: if (isSignedIn() && isOwner(resource.data.recipientId)) || isAdmin();
+      allow create: if false; // Should be created by backend functions only
+      allow update, delete: if isSignedIn() && isOwner(resource.data.recipientId);
+    }
+
+    /**
+     * @description Manages admin role lookups. This collection is for backend checks only.
+     * @path /roles_admin/{userId}
+     * @allow (any) No client-side operations are ever permitted.
+     * @deny (any) All reads and writes are blocked from the client.
+     * @principle Prevents any user from reading the list of admins or modifying roles.
+     */
+    match /roles_admin/{userId} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
 import MyStudents from "@/components/dashboard/my-students";
+import ManageAvailability from "@/components/dashboard/ManageAvailability";
 
 export default function MentorDashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -29,9 +30,12 @@ export default function MentorDashboardPage() {
             )}
           </div>
           
-          <MyStudents />
-
+          <ManageAvailability />
           <Separator />
+
+          <MyStudents />
+          <Separator />
+
           <MySessions role="mentor" />
         </div>
       </main>

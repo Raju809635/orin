@@ -11,12 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, Clock, Calendar as CalendarIcon, AlertCircle } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
-import { doc, addDoc, collection } from "firebase/firestore";
+import { useCollection, useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
+import { doc, addDoc, collection, query, where, writeBatch } from "firebase/firestore";
 import type { User } from "@/models/user";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { TimeSlot } from "@/models/timeslot";
 
 export default function MentorProfilePage() {
   const params = useParams<{ mentorId: string }>();
@@ -26,17 +27,28 @@ export default function MentorProfilePage() {
   const { toast } = useToast();
 
   const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<WithId<TimeSlot> | null>(null);
   const [isBooking, setIsBooking] = React.useState(false);
   
   const mentorDocRef = useMemoFirebase(
     () => (firestore && params.mentorId ? doc(firestore, "users", params.mentorId) : null),
     [firestore, params.mentorId]
   );
-  const { data: mentor, isLoading } = useDoc<User>(mentorDocRef);
+  const { data: mentor, isLoading: isMentorLoading } = useDoc<User>(mentorDocRef);
 
-  // Hardcoded availability for this example. In a full app, this would be fetched from the mentor's profile.
-  const timeSlots = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM", "04:00 PM"];
+  const timeSlotsQuery = useMemoFirebase(
+    () => {
+      if (!firestore || !params.mentorId || !date) return null;
+      const q = query(
+        collection(firestore, "users", params.mentorId, "timeslots"),
+        where("date", "==", date.toISOString().split("T")[0]),
+        where("bookingStatus", "==", "available")
+      );
+      return q;
+    },
+    [firestore, params.mentorId, date]
+  );
+  const { data: timeSlots, isLoading: areSlotsLoading } = useCollection<TimeSlot>(timeSlotsQuery);
   
   // Placeholder data for fields not yet in mentor profile
   const expertise = ['New Mentor'];
@@ -51,7 +63,7 @@ export default function MentorProfilePage() {
       router.push(`/signin?redirect=/mentors/${params.mentorId}`);
       return;
     }
-    if (!date || !selectedTime || !mentor) {
+    if (!date || !selectedTimeSlot || !mentor || !firestore) {
         toast({
             title: "Booking Incomplete",
             description: "Please select a date and time to book a session.",
@@ -59,26 +71,43 @@ export default function MentorProfilePage() {
         });
       return;
     }
+    if (currentUser.id === mentor.id) {
+        toast({
+            title: "Cannot Book Yourself",
+            description: "You cannot book a session with yourself.",
+            variant: "destructive",
+        });
+        return;
+    }
     setIsBooking(true);
 
     try {
-        const bookingsCollection = collection(firestore, 'bookings');
-        await addDoc(bookingsCollection, {
+        const batch = writeBatch(firestore);
+
+        // 1. Create the new booking document
+        const newBookingRef = doc(collection(firestore, 'bookings'));
+        batch.set(newBookingRef, {
             studentId: currentUser.id,
             studentName: currentUser.displayName,
             mentorId: mentor.id,
             mentorName: mentor.displayName,
             subject: expertise.join(', '),
-            date: date.toISOString().split('T')[0], // Store date as YYYY-MM-DD
-            time: selectedTime,
+            date: selectedTimeSlot.date,
+            time: selectedTimeSlot.startTime,
             price: price,
             status: 'confirmed',
             createdAt: new Date().toISOString(),
         });
 
+        // 2. Update the timeslot to mark it as booked
+        const timeSlotRef = doc(firestore, "users", mentor.id, "timeslots", selectedTimeSlot.id);
+        batch.update(timeSlotRef, { bookingStatus: 'booked' });
+
+        await batch.commit();
+
         toast({
             title: "Session Booked!",
-            description: `Your session with ${mentor.displayName} on ${date.toLocaleDateString()} at ${selectedTime} is confirmed.`,
+            description: `Your session with ${mentor.displayName} on ${new Date(selectedTimeSlot.date).toLocaleDateString()} at ${selectedTimeSlot.startTime} is confirmed.`,
         });
 
         router.push('/dashboard');
@@ -95,6 +124,7 @@ export default function MentorProfilePage() {
     }
   };
 
+  const isLoading = isMentorLoading || (!!date && areSlotsLoading);
 
   if (isLoading) {
     return (
@@ -208,17 +238,23 @@ export default function MentorProfilePage() {
                     <CardDescription>All times are in your local timezone.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-3 gap-2">
-                        {timeSlots.map(time => (
-                            <Button 
-                                key={time} 
-                                variant={selectedTime === time ? "default" : "outline"}
-                                onClick={() => setSelectedTime(time)}
-                            >
-                                {time}
-                            </Button>
-                        ))}
-                    </div>
+                    {areSlotsLoading ? <Skeleton className="h-20 w-full" /> : (
+                      timeSlots && timeSlots.length > 0 ? (
+                        <div className="grid grid-cols-3 gap-2">
+                            {timeSlots.map(slot => (
+                                <Button 
+                                    key={slot.id} 
+                                    variant={selectedTimeSlot?.id === slot.id ? "default" : "outline"}
+                                    onClick={() => setSelectedTimeSlot(slot)}
+                                >
+                                    {slot.startTime}
+                                </Button>
+                            ))}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground text-sm">No available slots for this date.</p>
+                      )
+                    )}
                      {!currentUser && (
                          <Alert className="mt-6">
                             <AlertCircle className="h-4 w-4" />
@@ -231,7 +267,7 @@ export default function MentorProfilePage() {
                     <Button 
                         className="w-full mt-6 h-12" 
                         onClick={handleBooking}
-                        disabled={isBooking || !selectedTime}
+                        disabled={isBooking || !selectedTimeSlot}
                     >
                         {isBooking ? 'Booking...' : `Book Session for $${price}`}
                     </Button>
@@ -245,3 +281,4 @@ export default function MentorProfilePage() {
   );
 }
 
+type WithId<T> = T & { id: string };
