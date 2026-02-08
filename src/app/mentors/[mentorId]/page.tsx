@@ -42,6 +42,7 @@ export default function MentorProfilePage() {
                 />
                 <div className="flex-grow">
                   <h1 className="text-3xl md:text-4xl font-bold font-headline">{mentor.name}</h1>
+                  <p className="text-muted-foreground mt-1">{mentor.role} @ {mentor.company}</p>
                   <div className="flex items-center text-muted-foreground my-3">
                     <div className="flex items-center">
                       <Star className="w-5 h-5 text-accent fill-accent mr-1" />

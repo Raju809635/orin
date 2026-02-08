@@ -134,6 +134,8 @@ export default function MentorsPage() {
                       key={mentor.id}
                       id={mentor.id}
                       name={mentor.name}
+                      role={mentor.role}
+                      company={mentor.company}
                       imageUrl={mentor.imageUrl}
                       imageHint={mentor.imageHint}
                       expertise={mentor.expertise}

@@ -2,6 +2,8 @@ export const mentors = [
   {
     id: 1,
     name: 'Sarah Johnson',
+    role: 'Physics Professor',
+    company: 'IIT Bombay',
     imageUrl: 'https://picsum.photos/seed/m1/300/300',
     imageHint: 'professional woman',
     expertise: ['JEE Mains', 'Physics', 'Advanced Math'],
@@ -12,6 +14,8 @@ export const mentors = [
   {
     id: 2,
     name: 'David Chen',
+    role: 'Medical Student',
+    company: 'AIIMS Delhi',
     imageUrl: 'https://picsum.photos/seed/m2/300/300',
     imageHint: 'professional man',
     expertise: ['NEET', 'Biology', 'Chemistry'],
@@ -22,6 +26,8 @@ export const mentors = [
   {
     id: 3,
     name: 'Priya Patel',
+    role: 'IAS Officer',
+    company: 'Government of India',
     imageUrl: 'https://picsum.photos/seed/m3/300/300',
     imageHint: 'professional woman',
     expertise: ['UPSC', 'Public Admin', 'History'],
@@ -32,6 +38,8 @@ export const mentors = [
   {
     id: 4,
     name: 'Michael Rodriguez',
+    role: 'Software Engineer',
+    company: 'Google',
     imageUrl: 'https://picsum.photos/seed/m4/300/300',
     imageHint: 'professional man',
     expertise: ['Web Development', 'React', 'Node.js'],
@@ -42,6 +50,8 @@ export const mentors = [
   {
     id: 5,
     name: 'Emily Williams',
+    role: 'Corporate Lawyer',
+    company: 'Cyril Amarchand Mangaldas',
     imageUrl: `https://picsum.photos/seed/m5/300/300`,
     imageHint: 'professional woman',
     expertise: ['CLAT', 'Constitutional Law', 'Logic'],
@@ -52,6 +62,8 @@ export const mentors = [
   {
     id: 6,
     name: 'James Brown',
+    role: 'IBPS PO',
+    company: 'State Bank of India',
     imageUrl: `https://picsum.photos/seed/m6/300/300`,
     imageHint: 'professional man',
     expertise: ['SSC CGL', 'Quantitative Aptitude'],
@@ -62,6 +74,8 @@ export const mentors = [
   {
     id: 7,
     name: 'Jessica Lee',
+    role: 'Senior Consultant',
+    company: 'Deloitte',
     imageUrl: `https://picsum.photos/seed/m7/300/300`,
     imageHint: 'professional person',
     expertise: ['IELTS', 'Spoken English', 'Grammar'],
@@ -72,6 +86,8 @@ export const mentors = [
   {
     id: 8,
     name: 'Chris Taylor',
+    role: 'Lead Data Scientist',
+    company: 'Microsoft',
     imageUrl: `https://picsum.photos/seed/m8/300/300`,
     imageHint: 'professional portrait',
     expertise: ['Data Science', 'Python', 'Machine Learning'],

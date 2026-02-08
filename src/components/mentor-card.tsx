@@ -9,6 +9,8 @@ import Link from 'next/link';
 type MentorCardProps = {
   id: number;
   name: string;
+  role: string;
+  company: string;
   imageUrl: string;
   imageHint: string;
   expertise: string[];
@@ -17,7 +19,7 @@ type MentorCardProps = {
   price: number;
 };
 
-const MentorCard = ({ id, name, imageUrl, imageHint, expertise, rating, reviews, price }: MentorCardProps) => {
+const MentorCard = ({ id, name, role, company, imageUrl, imageHint, expertise, rating, reviews, price }: MentorCardProps) => {
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-lg flex flex-col">
       <CardContent className="p-0 flex flex-col flex-grow">
@@ -35,6 +37,14 @@ const MentorCard = ({ id, name, imageUrl, imageHint, expertise, rating, reviews,
         </div>
         <div className="p-4 flex flex-col flex-grow">
           <h3 className="font-headline font-semibold text-lg">{name}</h3>
+          <p className="text-sm text-muted-foreground truncate">{role} @ {company}</p>
+
+          <div className="flex flex-wrap gap-1 my-2">
+            {expertise.slice(0, 2).map((skill) => (
+              <Badge key={skill} variant="secondary">{skill}</Badge>
+            ))}
+          </div>
+
           <div className="flex items-center text-sm text-muted-foreground my-2">
             <div className="flex items-center">
               <Star className="w-4 h-4 text-accent fill-accent mr-1" />
@@ -42,15 +52,11 @@ const MentorCard = ({ id, name, imageUrl, imageHint, expertise, rating, reviews,
               <span className="ml-1">({reviews} reviews)</span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-1 my-2">
-            {expertise.slice(0, 3).map((skill) => (
-              <Badge key={skill} variant="secondary">{skill}</Badge>
-            ))}
-          </div>
+          
           <div className="mt-auto pt-4 flex justify-between items-center">
             <p className="text-lg font-semibold font-headline">${price}<span className="text-sm font-normal text-muted-foreground">/session</span></p>
-            <Button asChild variant="link" className="p-0 h-auto">
-              <Link href={`/mentors/${id}`}>View Profile</Link>
+            <Button asChild>
+              <Link href={`/mentors/${id}`}>Book Now</Link>
             </Button>
           </div>
         </div>
