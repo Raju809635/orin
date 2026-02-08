@@ -21,9 +21,10 @@
  *   user enumeration and privilege escalation.
  * - Most user-owned data can be read by admins, but not modified, to prevent accidental
  *   data corruption.
- * - Listing documents is generally disabled for collections containing sensitive data. 
- *   It is enabled for `/bookings` because client-side queries are secured by `get` rules
- *   that verify ownership (`studentId` or `mentorId`) for each document in the result set.
+ * - For collection queries (`list` operations), rules that depend on document data (`resource.data`)
+ *   require the client to use a corresponding `where()` clause. This is a fundamental
+ *   security principle in Firestore. For example, to list bookings, the client must filter
+ *   by `studentId` or `mentorId`.
  * - Chat messages and reviews are subcollections of a booking, ensuring that interactions
  *   are tied to a confirmed session and accessible only to the involved participants.
  *
@@ -59,6 +60,7 @@ service cloud.firestore {
      * Returns true if the requesting user has an admin role.
      * Admin status is determined by the existence of a document in the
      * `/roles_admin` collection corresponding to the user's UID.
+     * IMPORTANT: This involves a `get()` call and CANNOT be used for `list` rules.
      */
     function isAdmin() {
       return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
@@ -234,14 +236,16 @@ service cloud.firestore {
     /**
      * @description Controls access to booking documents.
      * @path /bookings/{bookingId}
-     * @allow (read) The student or mentor involved in the booking can read it.
-     * @principle Access is granted based on denormalized participant IDs (`studentId`, `mentorId`) on the document. This more explicit rule is intended to resolve persistent deployment issues.
+     * @allow (get) The student, mentor, or an admin can read the booking.
+     * @allow (list) The student or mentor can query bookings they are a part of.
+     * @principle Access is granted based on denormalized participant IDs (`studentId`, `mentorId`) on the document.
      */
     match /bookings/{bookingId} {
-      allow read: if (request.auth != null && (request.auth.uid == resource.data.studentId || request.auth.uid == resource.data.mentorId)) || isAdmin();
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.studentId;
-      allow update: if request.auth != null && (request.auth.uid == request.resource.data.studentId || request.auth.uid == request.resource.data.mentorId);
-      allow delete: if request.auth != null && (request.auth.uid == resource.data.studentId || request.auth.uid == resource.data.mentorId);
+      allow get: if (isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId))) || isAdmin();
+      allow list: if isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId));
+      allow create: if isSignedIn() && isOwner(request.resource.data.studentId);
+      allow update: if isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId));
+      allow delete: if isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId));
       
       /**
        * @description Controls access to reviews for a specific booking.
