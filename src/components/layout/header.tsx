@@ -59,7 +59,7 @@ const Header = () => {
             <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
                 <GraduationCap className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-bold font-headline text-2xl tracking-tighter">MentorBridge</span>
+            <span className="font-bold font-headline text-2xl tracking-tighter">Orin</span>
           </Link>
         </div>
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -151,7 +151,7 @@ const Header = () => {
                         <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
                             <GraduationCap className="h-5 w-5 text-primary-foreground" />
                         </div>
-                        <span className="font-bold font-headline text-2xl tracking-tighter">MentorBridge</span>
+                        <span className="font-bold font-headline text-2xl tracking-tighter">Orin</span>
                     </Link>
                   </SheetTitle>
               </SheetHeader>

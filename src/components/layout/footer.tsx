@@ -12,7 +12,7 @@ const Footer = () => {
                 <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
                     <GraduationCap className="h-5 w-5 text-primary-foreground" />
                 </div>
-                <span className="font-bold font-headline text-2xl tracking-tighter text-white">MentorBridge</span>
+                <span className="font-bold font-headline text-2xl tracking-tighter text-white">Orin</span>
             </Link>
             <p className="text-sm mt-4">Empowering students with expert mentorship for academic and career success.</p>
           </div>
@@ -42,7 +42,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-16 border-t border-gray-800 pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} MentorBridge. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Orin. All rights reserved.</p>
         </div>
       </div>
     </footer>
