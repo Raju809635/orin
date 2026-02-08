@@ -39,9 +39,10 @@ export default function BecomeAMentorPage() {
     setDoc(userDocRef, { role: 'mentor' }, { merge: true })
       .then(() => {
         toast({
-          title: "Application Submitted!",
-          description: "You are now a mentor! Please sign in again to access your mentor dashboard.",
+          title: "Application Approved!",
+          description: "Congratulations! You are now a mentor.",
         });
+        // Redirect to the sign-in page, which now handles routing for mentors.
         router.push('/signin');
       })
       .catch((serverError) => {

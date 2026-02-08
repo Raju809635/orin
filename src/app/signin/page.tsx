@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import Link from "next/link";
 import { GraduationCap, LayoutDashboard, User as UserIcon } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth, useFirestore } from "@/firebase";
+import { useAuth, useFirestore, useUser } from "@/firebase";
 import { 
   GoogleAuthProvider, 
   signInWithPopup, 
@@ -29,6 +29,20 @@ export default function SignInPage() {
   const { toast } = useToast();
   const auth = useAuth();
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
+
+  // This effect handles users who are already logged in when they arrive at this page.
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      // If the user is a mentor, show them the dashboard selection screen.
+      if (user.role === 'mentor') {
+        setLoggedInUser(user);
+      } else {
+        // If they are a student, send them to their dashboard.
+        router.push('/dashboard');
+      }
+    }
+  }, [user, isUserLoading, router]);
 
   const handleUserLogin = async (firebaseUser: FirebaseUser) => {
     if (firebaseUser && firestore) {
@@ -90,10 +104,10 @@ export default function SignInPage() {
     }
   };
   
-  if (isLoading) {
+  if (isUserLoading && !user) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>Signing in...</p>
+        <p>Loading...</p>
       </div>
     );
   }
