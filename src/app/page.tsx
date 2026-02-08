@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import GoogleIcon from "@/components/icons/google-icon";
@@ -21,7 +20,6 @@ import {
 import { setDoc, doc } from "firebase/firestore";
 
 export default function SignUpPage() {
-  const [role, setRole] = useState('student');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -37,26 +35,22 @@ export default function SignUpPage() {
     const userData = {
       id: user.uid,
       email: user.email,
-      displayName: user.displayName || '',
+      displayName: user.displayName || email.split('@')[0], // Default display name from email
       photoURL: user.photoURL || '',
-      role: role,
+      role: 'student', // Default role for all new sign-ups
     };
 
     setDoc(userDocRef, userData, { merge: true })
       .then(() => {
-        // On success, all users are directed to create a student profile first.
+        // On success, all users are directed to create a profile.
         router.push('/create-student-profile');
       })
       .catch((serverError) => {
-        // Create the rich, contextual error.
         const permissionError = new FirestorePermissionError({
           path: userDocRef.path,
           operation: 'create',
           requestResourceData: userData,
         });
-
-        // Emit the error globally. The FirebaseErrorListener will catch this
-        // and throw it, triggering the Next.js error boundary.
         errorEmitter.emit('permission-error', permissionError);
       });
   };
@@ -64,9 +58,7 @@ export default function SignUpPage() {
   const handleGoogleSignUp = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      // Step 1: Await authentication.
       const result = await signInWithPopup(auth, provider);
-      // Step 2: Call the non-blocking save function.
       saveUserDocument(result.user);
     } catch (error: any) {
       console.error("Google Sign-Up Error: ", error);
@@ -106,14 +98,10 @@ export default function SignUpPage() {
     }
 
     try {
-      // Step 1: Await authentication
       const result = await createUserWithEmailAndPassword(auth, email, password);
-      // Step 2: Call the non-blocking save function
       saveUserDocument(result.user);
     } catch (error: any) {
         console.error("Email Sign-Up Error: ", error);
-        // This will only catch auth errors (e.g., email-already-in-use).
-        // Firestore errors are handled by the event emitter.
         toast({
             title: "Sign up failed",
             description: error.message || "An unexpected error occurred.",
@@ -151,19 +139,6 @@ export default function SignUpPage() {
                <div className="space-y-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
                 <Input id="confirm-password" type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                 <Label>I am a</Label>
-                 <RadioGroup defaultValue="student" className="flex space-x-4" onValueChange={setRole}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="student" id="role-student" />
-                      <Label htmlFor="role-student">Student</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="mentor" id="role-mentor" />
-                      <Label htmlFor="role-mentor">Mentor</Label>
-                    </div>
-                  </RadioGroup>
               </div>
               
               <Button className="w-full h-12" onClick={handleEmailSignUp}>Sign Up</Button>

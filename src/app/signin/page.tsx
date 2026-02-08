@@ -43,8 +43,6 @@ export default function SignInPage() {
           router.push('/dashboard');
         }
       } else {
-        // This case can happen if a user authenticates but their user document write fails.
-        // We direct them back to sign-up to ensure a user document is created.
         toast({
           title: "Profile not found",
           description: "Please complete your profile to continue.",
