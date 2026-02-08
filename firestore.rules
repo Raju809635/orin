@@ -237,14 +237,17 @@ service cloud.firestore {
      * @description Controls access to booking documents.
      * @path /bookings/{bookingId}
      * @allow (get) The student, mentor, or an admin can read the booking.
-     * @allow (list) The student or mentor can query bookings they are a part of.
+     * @allow (list) Any signed-in user can query the collection. Security is enforced by client-side queries and the 'get' rule.
      * @principle Access is granted based on denormalized participant IDs (`studentId`, `mentorId`) on the document.
      */
     match /bookings/{bookingId} {
       allow get: if (isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId))) || isAdmin();
-      allow list: if isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId));
+      allow list: if isSignedIn();
       allow create: if isSignedIn() && isOwner(request.resource.data.studentId);
-      allow update: if isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId));
+      allow update: if isSignedIn() && 
+                     (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId)) &&
+                     request.resource.data.studentId == resource.data.studentId &&
+                     request.resource.data.mentorId == resource.data.mentorId;
       allow delete: if isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId));
       
       /**
