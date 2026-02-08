@@ -104,7 +104,7 @@ const Header = () => {
                                 <DropdownMenuItem asChild>
                                     <Link href="/dashboard">
                                         <LayoutDashboard className="mr-2 h-4 w-4" />
-                                        <span>Student Dashboard</span>
+                                        <span>Your Dashboard</span>
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
@@ -189,7 +189,7 @@ const Header = () => {
                    <div className="flex flex-col space-y-4">
                       {user.role === 'mentor' ? (
                         <>
-                          <Link href="/dashboard" onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Student Dashboard</Link>
+                          <Link href="/dashboard" onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Your Dashboard</Link>
                           <Link href="/mentor-dashboard" onClick={() => setIsOpen(false)} className="text-base font-medium transition-colors hover:text-primary text-foreground/80">Mentor Dashboard</Link>
                         </>
                       ) : (

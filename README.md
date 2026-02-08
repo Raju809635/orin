@@ -29,8 +29,8 @@ This is the primary journey for a user seeking mentorship.
 - **Mentor Profile:** Clicking on a mentor's card leads to their detailed profile page (`/mentors/[mentorId]`). Here, students can learn more about the mentor's expertise, experience, and see their availability.
 - **Booking:** The profile page includes a calendar and time slots. A student can select a date and time and click "Book Session" to schedule a mentorship session. *(Note: The final booking and payment logic is a future implementation)*.
 
-### 4. The Student Dashboard
-The Student Dashboard (`/dashboard`) is the central hub for students. It contains:
+### 4. Your Dashboard (Student View)
+The dashboard at `/dashboard` is the central hub for students. It contains:
 - **Featured Mentors:** Recommendations for mentors.
 - **My Sessions:** Lists of upcoming and past mentorship sessions.
 
@@ -47,7 +47,7 @@ This flow is for experts who want to offer their services on the platform.
 
 ### 2. Post-Approval Experience
 - **Immediate Redirection:** Once the application is submitted, the user is redirected to the `/signin` page, which intelligently handles their new role.
-- **Dashboard Selection:** The sign-in page recognizes their "mentor" role and presents them with two choices: "Go to Your Dashboard" (Student View) or "Go to Mentor Dashboard." This allows mentors to also use the platform as students if they wish.
+- **Dashboard Selection:** The sign-in page recognizes their "mentor" role and presents them with two choices: "Go to Your Dashboard" (the student view) or "Go to Mentor Dashboard." This allows mentors to also use the platform as students if they wish.
 
 ### 3. Managing the Mentor Profile
 - **Visibility:** As soon as a user's role is updated to "mentor", their profile automatically appears on the public `/mentors` listing page for all students to see.
@@ -56,7 +56,7 @@ This flow is for experts who want to offer their services on the platform.
 ### 4. The Mentor Dashboard
 The Mentor Dashboard (`/mentor-dashboard`) is the control center for mentors.
 - It displays a list of their students and upcoming sessions.
-- From the header, mentors have a dedicated dropdown menu that allows them to easily switch between their **Mentor Dashboard** and their **Student Dashboard**.
+- From the header, mentors have a dedicated dropdown menu that allows them to easily switch between their **Mentor Dashboard** and **Your Dashboard** (the student view).
 
 ---
 
@@ -67,7 +67,7 @@ The Mentor Dashboard (`/mentor-dashboard`) is the control center for mentors.
 - **`/home`:** The main landing page for authenticated users.
 - **`/mentors`:** The main directory where students can find and filter mentors.
 - **`/mentors/[mentorId]`:** The detailed public profile page for a single mentor.
-- **`/dashboard`:** The personalized dashboard for **students**.
+- **`/dashboard`:** The personalized dashboard for students (referred to as "Your Dashboard").
 - **`/mentor-dashboard`:** The personalized dashboard for **mentors**.
 - **`/profile`:** The page where any logged-in user (student or mentor) can edit their personal profile information.
 - **`/become-a-mentor`:** The application page for students who wish to become mentors. It intelligently shows a status page to users who are already mentors.
