@@ -43,7 +43,8 @@ const Header = () => {
 
   const getProfileHref = () => {
     if (!user) return "/";
-    return user.role === 'mentor' ? '/create-mentor-profile' : '/create-student-profile';
+    // The profile pages are for initial setup. After that, the user's dashboard serves as their profile hub.
+    return user.role === 'mentor' ? '/mentor-dashboard' : '/dashboard';
   }
 
   const getInitials = (name?: string | null) => {
