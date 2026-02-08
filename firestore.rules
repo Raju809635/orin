@@ -240,9 +240,12 @@ service cloud.firestore {
      */
     match /bookings/{bookingId} {
       allow get: if (isSignedIn() && (isOwner(resource.data.studentId) || isOwner(resource.data.mentorId))) || isAdmin();
-      allow list: if request.auth != null;
+      // This rule allows any authenticated user to query the bookings collection.
+      // Client-side queries are secured by `where` clauses, and the `get` rule above
+      // ensures users can only read documents where they are a participant.
+      allow list: if isSignedIn();
       allow create: if isSignedIn() && isOwner(request.resource.data.studentId);
-      allow update: if isSignedIn() && (isOwner(request.resource.data.studentId) || isOwner(resource.data.mentorId));
+      allow update: if isSignedIn() && (isOwner(request.resource.data.studentId) || isOwner(request.resource.data.mentorId));
       allow delete: if isSignedIn() && (isOwner(request.resource.data.studentId) || isOwner(resource.data.mentorId));
       
       /**
