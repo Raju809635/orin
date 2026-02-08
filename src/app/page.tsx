@@ -44,12 +44,8 @@ export default function SignUpPage() {
 
     setDoc(userDocRef, userData, { merge: true })
       .then(() => {
-        // On success, navigate to the correct profile creation page.
-        if (role === 'student') {
-          router.push('/create-student-profile');
-        } else {
-          router.push('/create-mentor-profile');
-        }
+        // On success, all users are directed to create a student profile first.
+        router.push('/create-student-profile');
       })
       .catch((serverError) => {
         // Create the rich, contextual error.

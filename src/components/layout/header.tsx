@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Menu, GraduationCap, LayoutDashboard, User as UserIcon, LogOut } from "lucide-react";
 import { useAuth, useUser } from "@/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
@@ -37,14 +37,15 @@ const Header = () => {
   ];
   
   const getDashboardHref = () => {
-      if (!user) return "/";
-      return user.role === 'mentor' ? '/mentor-dashboard' : '/dashboard';
+      // All users are directed to the student dashboard from the header.
+      // Mentors can access their dashboard from the sign-in page.
+      return '/dashboard';
   }
 
   const getProfileHref = () => {
     if (!user) return "/";
     // The profile pages are for initial setup. After that, the user's dashboard serves as their profile hub.
-    return user.role === 'mentor' ? '/mentor-dashboard' : '/dashboard';
+    return '/dashboard';
   }
 
   const getInitials = (name?: string | null) => {
@@ -138,7 +139,7 @@ const Header = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
-              <SheetHeader className="mb-6">
+              <SheetHeader>
                 <SheetTitle>
                    <Link href="/home" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
                       <div className="bg-primary rounded-md p-1.5 flex items-center justify-center">
@@ -148,7 +149,7 @@ const Header = () => {
                   </Link>
                 </SheetTitle>
               </SheetHeader>
-              <div className="flex flex-col space-y-4">
+              <div className="flex flex-col space-y-4 mt-6">
                 {navLinks.map((link) => (
                   <Link
                     key={link.label}
