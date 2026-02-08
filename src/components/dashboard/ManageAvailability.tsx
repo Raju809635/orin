@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -21,6 +22,7 @@ export default function ManageAvailability() {
   const { toast } = useToast();
 
   const [date, setDate] = useState<Date | undefined>();
+  const [month, setMonth] = useState<Date | undefined>();
   const [minDate, setMinDate] = useState<Date | undefined>();
   const [newTime, setNewTime] = useState('');
 
@@ -30,6 +32,7 @@ export default function ManageAvailability() {
     yesterday.setDate(today.getDate() - 1);
     
     setDate(today);
+    setMonth(today);
     setMinDate(yesterday);
   }, []);
 
@@ -88,6 +91,8 @@ export default function ManageAvailability() {
               mode="single"
               selected={date}
               onSelect={setDate}
+              month={month}
+              onMonthChange={setMonth}
               className="rounded-md border"
               disabled={(d) => !!minDate && d < minDate}
             />

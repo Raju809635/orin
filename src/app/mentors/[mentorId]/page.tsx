@@ -27,6 +27,7 @@ export default function MentorProfilePage() {
   const { toast } = useToast();
 
   const [date, setDate] = React.useState<Date | undefined>();
+  const [month, setMonth] = React.useState<Date | undefined>();
   const [minDate, setMinDate] = React.useState<Date | undefined>();
   const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<WithId<TimeSlot> | null>(null);
   const [isBooking, setIsBooking] = React.useState(false);
@@ -37,6 +38,7 @@ export default function MentorProfilePage() {
     yesterday.setDate(today.getDate() - 1);
     
     setDate(today);
+    setMonth(today);
     setMinDate(yesterday);
   }, []);
 
@@ -237,6 +239,8 @@ export default function MentorProfilePage() {
                         mode="single"
                         selected={date}
                         onSelect={setDate}
+                        month={month}
+                        onMonthChange={setMonth}
                         className="rounded-md border p-0"
                         disabled={(date) => !!minDate && date < minDate}
                     />
