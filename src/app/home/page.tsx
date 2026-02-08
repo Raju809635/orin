@@ -25,11 +25,11 @@ export default function HomePage() {
       <Header />
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="bg-gradient-to-b from-violet-50 to-background py-20 md:py-32">
+        <section className="bg-secondary py-20 md:py-32">
           <div className="container">
             <div className="max-w-4xl text-center mx-auto">
               <h1 className="text-5xl md:text-7xl font-bold font-headline tracking-tight">
-                Find Your <span className="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-transparent bg-clip-text">Perfect Mentor</span>
+                Find Your <span className="bg-gradient-to-r from-primary to-accent text-transparent bg-clip-text">Perfect Mentor</span>
               </h1>
               <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
                 Connect with expert mentors for academic success and career growth. Personalized guidance across all subjects and competitive exams.
