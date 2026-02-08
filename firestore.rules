@@ -107,8 +107,8 @@ service cloud.firestore {
      * @principle A user can only create, read, update, or delete their own data. Admins have read-only access.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
-      allow list: if isAdmin();
+      allow get: if isOwner(userId) || isAdmin() || resource.data.role == 'mentor';
+      allow list: if isSignedIn();
       allow create: if isOwner(userId) && createdWithValidUserId(userId);
       allow update: if isOwner(userId) && userIdIsImmutable();
       allow delete: if isOwner(userId);
