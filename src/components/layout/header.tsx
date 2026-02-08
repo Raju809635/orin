@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, GraduationCap, LayoutDashboard, User as UserIcon, LogOut } from "lucide-react";
 import { useAuth, useUser } from "@/firebase";
 import { signOut as firebaseSignOut } from "firebase/auth";
